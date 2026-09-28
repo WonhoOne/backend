@@ -30,6 +30,14 @@ Do not begin implementation against an unapproved local assumption when the requ
 - Backend unit and integration tests
 - Public API implementation matching the approved docs contract
 
+## Cross-repository access
+
+- `WonhoOne/backend` is this Agent's writable implementation area.
+- `WonhoOne/frontend` and `WonhoOne/ai-console` are **read-only by default**.
+- Their code may be inspected for API usage, integration debugging, and impact analysis.
+- Do not modify, commit to, or open implementation PRs against those repositories unless their Owner or the team explicitly delegates the task.
+- If another repository needs a change, create/request an Issue for its Owner with the required behavior, contract impact, and reproduction context.
+
 ## Non-negotiable rules
 
 - Backend is the final authority for validating shared business rules.
