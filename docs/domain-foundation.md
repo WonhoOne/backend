@@ -2,13 +2,13 @@
 
 ## Scope
 
-This backend-internal implementation provides the pure Java domain rules needed to establish the v0.1.1 foundation. It does not add persistence or public API behavior.
+This backend-internal implementation provides the pure Java domain rules aligned with the shared v0.1.2 baseline. It does not add persistence or public API behavior.
 
 ## Shared Contract References
 
-Approved contract source: `WonhoOne/docs` on `main`, Baseline v0.1.1.
+Approved contract source: `WonhoOne/docs` on `main`, latest Baseline v0.1.2.
 
-- `baseline/BASELINE-v0.1.1.md`
+- `baseline/BASELINE-v0.1.2.md`
 - `requirements/requirements.md`
 - `requirements/domain-model.md`
 - `requirements/business-rules.md`
@@ -25,8 +25,10 @@ Related business rules: BR-01, BR-02, BR-03, BR-04, BR-06, BR-07, BR-12, BR-13, 
 
 ## Domain Responsibility
 
-- `Reservation` enforces `participantCount >= 1`.
-- `TourSchedule` owns its reservation collection, total participant count, confirmation threshold, and one-time first-confirmation transition.
+- `Reservation` enforces the generic `participantCount >= 1` invariant; it does not know its Theme.
+- `TourSchedule` validates Honeymoon's Theme-specific pair invariant before adding a Reservation, and owns its reservation collection, actual total participant count, recruitment threshold, and one-time first-confirmation transition.
+- A valid Honeymoon Reservation has an even `participantCount >= 2`. Its couple/team count is derived as `participantCount / 2`; a Honeymoon schedule confirms at 2 or more derived couples/teams. No Couple/Team Entity is used.
+- `totalParticipantCount` remains the count of actual participants. Whether the public API exposes `coupleCount` as a field remains TBD for API v0.2.
 - `TourStylePolicy` is the single place that validates the approved Theme/TourStyle eligibility combinations.
 - Collections exposed by `TourSchedule` are immutable snapshots. The domain is in-memory and has no persistence identity.
 

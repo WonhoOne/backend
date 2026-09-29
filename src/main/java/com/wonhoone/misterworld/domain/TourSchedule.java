@@ -17,10 +17,18 @@ public final class TourSchedule {
     /** Adds a reservation and returns true only when this call first confirms the schedule. */
     public boolean addReservation(Reservation reservation) {
         Objects.requireNonNull(reservation, "reservation must not be null");
-        reservations.add(reservation);
-        totalParticipantCount = Math.addExact(totalParticipantCount, reservation.participantCount());
 
-        if (!confirmed && totalParticipantCount >= confirmationThreshold()) {
+        validateReservationForSchedule(reservation);
+
+        long nextTotalParticipantCount = Math.addExact(totalParticipantCount, reservation.participantCount());
+        long nextHoneymoonCoupleCount = isHoneymoonSchedule()
+                ? Math.addExact(totalHoneymoonCoupleCount(), reservation.participantCount() / 2L)
+                : 0;
+
+        reservations.add(reservation);
+        totalParticipantCount = nextTotalParticipantCount;
+
+        if (!confirmed && confirmationThresholdReached(nextTotalParticipantCount, nextHoneymoonCoupleCount)) {
             confirmed = true;
             return true;
         }
@@ -43,7 +51,25 @@ public final class TourSchedule {
         return confirmed;
     }
 
-    private int confirmationThreshold() {
-        return tourProduct.theme() == Theme.HONEYMOON_ROMANCE ? 4 : 3;
+    private void validateReservationForSchedule(Reservation reservation) {
+        if (isHoneymoonSchedule()
+                && (reservation.participantCount() < 2 || reservation.participantCount() % 2 != 0)) {
+            throw new IllegalArgumentException(
+                    "Honeymoon reservations must include an even number of at least 2 participants");
+        }
+    }
+
+    private boolean confirmationThresholdReached(long participantCount, long honeymoonCoupleCount) {
+        return isHoneymoonSchedule() ? honeymoonCoupleCount >= 2 : participantCount >= 3;
+    }
+
+    private long totalHoneymoonCoupleCount() {
+        return reservations.stream()
+                .mapToLong(reservation -> reservation.participantCount() / 2L)
+                .reduce(0L, Math::addExact);
+    }
+
+    private boolean isHoneymoonSchedule() {
+        return tourProduct.theme() == Theme.HONEYMOON_ROMANCE;
     }
 }

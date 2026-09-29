@@ -19,9 +19,10 @@ class DomainFoundationTests {
     }
 
     @Test
-    void reservationAcceptsOneOrMoreParticipants() {
+    void reservationAcceptsOneOrMoreParticipantsIncludingOddCounts() {
         assertEquals(1, reservation(1, "A").participantCount());
         assertEquals(2, reservation(2, "A").participantCount());
+        assertEquals(3, reservation(3, "A").participantCount());
     }
 
     @Test
@@ -40,12 +41,72 @@ class DomainFoundationTests {
     }
 
     @Test
-    void honeymoonScheduleConfirmsAtFourParticipants() {
-        TourSchedule schedule = schedule(Theme.HONEYMOON_ROMANCE);
-        assertFalse(schedule.addReservation(reservation(3, "A")));
-        assertFalse(schedule.isConfirmed());
-        assertTrue(schedule.addReservation(reservation(1, "B")));
+    void generalScheduleAcceptsSingleReservationOfThreeParticipants() {
+        TourSchedule schedule = schedule(Theme.GOLF_CHALLENGE);
+
+        assertTrue(schedule.addReservation(reservation(3, "A")));
+        assertEquals(3, schedule.totalParticipantCount());
         assertTrue(schedule.isConfirmed());
+    }
+
+    @Test
+    void honeymoonRejectsOddParticipantCountsInScheduleContext() {
+        for (int count : List.of(1, 3, 5)) {
+            TourSchedule schedule = schedule(Theme.HONEYMOON_ROMANCE);
+
+            assertThrows(IllegalArgumentException.class, () -> schedule.addReservation(reservation(count, "A")));
+            assertEquals(List.of(), schedule.reservations());
+            assertEquals(0, schedule.totalParticipantCount());
+            assertFalse(schedule.isConfirmed());
+        }
+    }
+
+    @Test
+    void oneHoneymoonReservationOfTwoParticipantsIsOneCoupleAndDoesNotConfirm() {
+        TourSchedule schedule = schedule(Theme.HONEYMOON_ROMANCE);
+        assertFalse(schedule.addReservation(reservation(2, "A")));
+        assertEquals(2, schedule.totalParticipantCount());
+        assertFalse(schedule.isConfirmed());
+    }
+
+    @Test
+    void honeymoonScheduleConfirmsAtTwoCouplesAcrossTwoReservations() {
+        TourSchedule schedule = schedule(Theme.HONEYMOON_ROMANCE);
+        assertFalse(schedule.addReservation(reservation(2, "A")));
+        assertEquals(2, schedule.totalParticipantCount());
+        assertTrue(schedule.addReservation(reservation(2, "B")));
+        assertEquals(4, schedule.totalParticipantCount());
+        assertTrue(schedule.isConfirmed());
+    }
+
+    @Test
+    void oneHoneymoonReservationOfFourParticipantsConfirmsImmediately() {
+        TourSchedule schedule = schedule(Theme.HONEYMOON_ROMANCE);
+
+        assertTrue(schedule.addReservation(reservation(4, "A")));
+        assertEquals(4, schedule.totalParticipantCount());
+        assertTrue(schedule.isConfirmed());
+    }
+
+    @Test
+    void largerEvenHoneymoonReservationIsAllowedAndCountsAsThreeCouples() {
+        TourSchedule schedule = schedule(Theme.HONEYMOON_ROMANCE);
+
+        assertTrue(schedule.addReservation(reservation(6, "A")));
+        assertEquals(6, schedule.totalParticipantCount());
+        assertTrue(schedule.isConfirmed());
+    }
+
+    @Test
+    void invalidHoneymoonAddLeavesExistingScheduleStateUnchanged() {
+        TourSchedule schedule = schedule(Theme.HONEYMOON_ROMANCE);
+        schedule.addReservation(reservation(2, "A"));
+
+        assertThrows(IllegalArgumentException.class, () -> schedule.addReservation(reservation(3, "B")));
+
+        assertEquals(1, schedule.reservations().size());
+        assertEquals(2, schedule.totalParticipantCount());
+        assertFalse(schedule.isConfirmed());
     }
 
     @Test
@@ -62,6 +123,17 @@ class DomainFoundationTests {
         schedule.addReservation(reservation(2, "A"));
         assertTrue(schedule.addReservation(reservation(2, "B")));
         assertEquals(4, schedule.totalParticipantCount());
+    }
+
+    @Test
+    void laterHoneymoonReservationDoesNotRepeatFirstConfirmationTransition() {
+        TourSchedule schedule = schedule(Theme.HONEYMOON_ROMANCE);
+        schedule.addReservation(reservation(2, "A"));
+        assertTrue(schedule.addReservation(reservation(2, "B")));
+
+        assertFalse(schedule.addReservation(reservation(2, "C")));
+        assertEquals(6, schedule.totalParticipantCount());
+        assertTrue(schedule.isConfirmed());
     }
 
     @Test
