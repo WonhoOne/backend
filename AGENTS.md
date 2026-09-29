@@ -2,11 +2,13 @@
 
 This repository implements the Mister World **Backend / Database** area.
 
-`WonhoOne/docs` **main** is the approved common SSOT. A docs feature branch is a proposal. Do not implement against the v0.1.1 proposal until it is merged into `docs/main`; use the currently approved baseline on `docs/main` until then.
+Current approved shared baseline: `WonhoOne/docs` **main — Baseline v0.1.1**.
+
+`docs/main` is the approved shared SSOT. Docs feature branches and unmerged docs PRs are proposals. Implementation must use the contracts merged into `docs/main`.
 
 ## Mandatory reading before implementation
 
-Before writing or modifying code, read the latest approved documents in `WonhoOne/docs`. The following v0.1.1 list applies after its merge into `docs/main`; until then follow the approved `docs/main` mandatory reading list:
+Before writing or modifying code, read the latest approved documents in `WonhoOne/docs`:
 
 1. `baseline/BASELINE-v0.1.1.md`
 2. `requirements/requirements.md`
@@ -23,7 +25,7 @@ Before writing or modifying code, read the latest approved documents in `WonhoOn
 
 Docs repository: https://github.com/WonhoOne/docs
 
-Do not begin implementation against an unapproved local assumption when the required baseline is not yet available on the approved docs branch.
+Do not begin implementation against an unapproved local assumption when the required baseline is not available on the approved docs branch.
 
 ## Backend responsibilities
 
