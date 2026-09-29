@@ -2,15 +2,13 @@
 
 This repository implements the Mister World **Backend / Database** area.
 
-Current approved shared baseline: `WonhoOne/docs` **main — Baseline v0.1.1**.
-
-`docs/main` is the approved shared SSOT. Docs feature branches and unmerged docs PRs are proposals. Implementation must use the contracts merged into `docs/main`.
+`WonhoOne/docs` **main** is the approved shared SSOT. Implementation must use the latest Baseline present on `docs/main`; docs feature branches and unmerged docs PRs are proposals.
 
 ## Mandatory reading before implementation
 
 Before writing or modifying code, read the latest approved documents in `WonhoOne/docs`:
 
-1. `baseline/BASELINE-v0.1.1.md`
+1. The latest Baseline present on `docs/main`
 2. `requirements/requirements.md`
 3. `requirements/product-catalog.md`
 4. `requirements/domain-model.md`

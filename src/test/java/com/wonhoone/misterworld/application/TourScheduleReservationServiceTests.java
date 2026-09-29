@@ -13,6 +13,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TourScheduleReservationServiceTests {
@@ -34,6 +35,67 @@ class TourScheduleReservationServiceTests {
 
         service.addReservation(schedule, reservation("A", 2));
         assertTrue(service.addReservation(schedule, reservation("B", 1)));
+
+        assertEquals(List.of("contact-A", "contact-B"), smsSender.contacts);
+    }
+
+    @Test
+    void sendsNoSmsForOneHoneymoonCoupleBeforeConfirmation() {
+        RecordingSmsSender smsSender = new RecordingSmsSender();
+        TourScheduleReservationService service = new TourScheduleReservationService(smsSender);
+        TourSchedule schedule = schedule(Theme.HONEYMOON_ROMANCE);
+
+        assertFalse(service.addReservation(schedule, reservation("A", 2)));
+
+        assertEquals(List.of(), smsSender.contacts);
+    }
+
+    @Test
+    void sendsSmsToBothHoneymoonApplicantsAtTwoCoupleConfirmation() {
+        RecordingSmsSender smsSender = new RecordingSmsSender();
+        TourScheduleReservationService service = new TourScheduleReservationService(smsSender);
+        TourSchedule schedule = schedule(Theme.HONEYMOON_ROMANCE);
+
+        service.addReservation(schedule, reservation("A", 2));
+        assertTrue(service.addReservation(schedule, reservation("B", 2)));
+
+        assertEquals(List.of("contact-A", "contact-B"), smsSender.contacts);
+    }
+
+    @Test
+    void oneHoneymoonReservationOfFourParticipantsImmediatelySendsConfirmationSms() {
+        RecordingSmsSender smsSender = new RecordingSmsSender();
+        TourScheduleReservationService service = new TourScheduleReservationService(smsSender);
+        TourSchedule schedule = schedule(Theme.HONEYMOON_ROMANCE);
+
+        assertTrue(service.addReservation(schedule, reservation("A", 4)));
+
+        assertEquals(List.of("contact-A"), smsSender.contacts);
+    }
+
+    @Test
+    void invalidHoneymoonReservationIsRejectedWithoutSms() {
+        RecordingSmsSender smsSender = new RecordingSmsSender();
+        TourScheduleReservationService service = new TourScheduleReservationService(smsSender);
+        TourSchedule schedule = schedule(Theme.HONEYMOON_ROMANCE);
+
+        assertThrows(IllegalArgumentException.class, () -> service.addReservation(schedule, reservation("A", 3)));
+
+        assertEquals(List.of(), smsSender.contacts);
+        assertEquals(List.of(), schedule.reservations());
+        assertEquals(0, schedule.totalParticipantCount());
+        assertFalse(schedule.isConfirmed());
+    }
+
+    @Test
+    void doesNotSendAnotherHoneymoonConfirmationBatchAfterConfirmation() {
+        RecordingSmsSender smsSender = new RecordingSmsSender();
+        TourScheduleReservationService service = new TourScheduleReservationService(smsSender);
+        TourSchedule schedule = schedule(Theme.HONEYMOON_ROMANCE);
+
+        service.addReservation(schedule, reservation("A", 2));
+        service.addReservation(schedule, reservation("B", 2));
+        assertFalse(service.addReservation(schedule, reservation("C", 2)));
 
         assertEquals(List.of("contact-A", "contact-B"), smsSender.contacts);
     }
