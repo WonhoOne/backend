@@ -7,7 +7,7 @@ Backend API, database, and business logic for Mister World.
 - Maven
 - Spring Boot 4.1.1
 
-Shared contracts are maintained in `WonhoOne/docs/main`. Backend-only implementation notes are in [`docs/backend-bootstrap.md`](docs/backend-bootstrap.md).
+Shared contracts are maintained in `WonhoOne/docs/main`. Backend-only implementation notes are in [`docs/backend-bootstrap.md`](docs/backend-bootstrap.md) and [`docs/domain-foundation.md`](docs/domain-foundation.md).
 
 Build and test with the Maven Wrapper:
 
