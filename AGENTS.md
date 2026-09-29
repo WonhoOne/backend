@@ -44,6 +44,15 @@ Do not begin implementation against an unapproved local assumption when the requ
 - Do not modify, commit to, or open implementation PRs against those repositories unless their Owner or the team explicitly delegates the task.
 - If another repository needs a change, create/request an Issue for its Owner with the required behavior, contract impact, and reproduction context.
 
+## Documentation placement policy
+
+- `WonhoOne/docs/main` is the shared contract SSOT. Only content merged there is approved.
+- Contracts that other repositories need to implement or integrate against belong in `WonhoOne/docs`.
+- Backend-only implementation documentation belongs in `WonhoOne/backend/docs/`.
+- If a Backend-internal decision begins to affect a cross-repository contract, propose the change in the shared docs first and wait for approval before implementing it.
+- Do not maintain duplicate copies of the same contract in shared docs and Backend-local docs.
+- Do not resolve TBD items in Backend-local documentation as though they were approved shared contracts.
+
 ## Non-negotiable rules
 
 - Backend is the final authority for validating shared business rules.
