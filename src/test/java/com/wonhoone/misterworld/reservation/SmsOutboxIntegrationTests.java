@@ -15,6 +15,18 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class SmsOutboxIntegrationTests extends ReservationIntegrationSupport {
     @Autowired ScheduleConfirmationOutboxService outbox;
 
+    @Test void surefireSystemPropertyOverridesDeliveryEnabledEnvironment() {
+        assertThat(System.getProperty("sms.delivery.enabled")).isEqualTo("false");
+        var hostileEnvironment = new org.springframework.core.env.SystemEnvironmentPropertySource(
+                "systemEnvironment", java.util.Map.of("SMS_DELIVERY_ENABLED", "true"));
+        var environment = new org.springframework.core.env.StandardEnvironment();
+        environment.getPropertySources().replace("systemEnvironment", hostileEnvironment);
+        assertThat(hostileEnvironment.getProperty("sms.delivery.enabled")).isEqualTo("true");
+        assertThat(environment.getProperty("sms.delivery.enabled")).isEqualTo("false");
+        assertThat(context.getEnvironment().getProperty("sms.delivery.enabled")).isEqualTo("false");
+        assertThat(context.getBeansOfType(com.wonhoone.misterworld.application.port.SmsSender.class)).isEmpty();
+    }
+
     @Test void noSmsEventBeforeScheduleConfirmation() {
         create(schedule, 2);
         assertThat(smsEvents.count()).isZero(); assertThat(smsRecipients.count()).isZero();

@@ -155,8 +155,11 @@ categories, never contacts, text, credentials, Authorization or profile data.
 | SOLAPI_CONNECT_TIMEOUT_SECONDS / SOLAPI_REQUEST_TIMEOUT_SECONDS | 5 / 10 |
 
 Enabled startup fails safely for missing credentials/sender or an unsupported
-provider. Properties diagnostic strings redact provider configuration. Test profile
-forces delivery off unless a test explicitly enables it with a mocked SmsSender.
+provider. Properties diagnostic strings redact provider configuration. Maven
+Surefire forces the test JVM system property sms.delivery.enabled=false, which
+outranks inherited OS SMS_DELIVERY_ENABLED=true and profile config data.
+Explicit Spring test properties still outrank that system property, allowing
+the intentionally enabled B8 tests to use their mocked SmsSender.
 CI uses fake sender/local HTTP only and sends no paid messages. No skipped live
 JUnit test is added.
 
@@ -187,10 +190,11 @@ create one event. SOLAPI tests use local JDK HttpServer for wire requests, accep
 and malformed/rejected responses, auth errors, timeout/network errors; HMAC has a
 fixed known signature test. Startup and executor rejection are also tested.
 
-The verified starting baseline is 357 tests. B8 adds 72 (outbox 16, after-commit 4,
+The verified starting baseline is 357 tests. B8 adds 73 (outbox 17, after-commit 4,
 delivery 12, concurrency 2, retry 4, signal/dispatcher 2, startup 6, SOLAPI HTTP 24,
-HMAC 2). Full Maven Wrapper test passes **429 tests, failures 0, errors 0, skipped 0**.
-Maven Wrapper package also passes 429 tests and builds the executable JAR.
+HMAC 2), including the Surefire-system-property versus enabled-environment regression.
+Full Maven Wrapper test passes **430 tests, failures 0, errors 0, skipped 0**.
+Maven Wrapper package also passes 430 tests and builds the executable JAR.
 Migration validation and staged/worktree diff checks pass. Tests never invoke
 the real provider.
 

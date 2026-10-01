@@ -19,7 +19,7 @@ employee:
   bootstrap:
     enabled: false
 
-# Tests never enable paid delivery through inherited environment variables.
+# Profile default; Surefire's JVM system property overrides inherited OS delivery settings.
 sms:
   delivery:
     enabled: false
