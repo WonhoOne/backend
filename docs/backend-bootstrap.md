@@ -16,6 +16,7 @@ This document records implementation status, not a duplicate API contract.
 | Base package | `com.wonhoone.misterworld` |
 | Persistence | Spring Data JPA / MySQL / Flyway |
 | Tests | Pure Java unit tests; H2 MySQL-mode persistence tests |
+| Authentication | Spring Security / Nimbus HS256 JWT; BCrypt; stateless |
 | CI | GitHub Actions on main pushes and main PRs |
 
 ## Implementation status
@@ -26,9 +27,10 @@ Flyway owns schema creation; Hibernate validates the migrated schema.
 
 Authentication (JWT Bearer), DTOs, common errors, collection ordering without
 pagination, price/Loyalty, Inventory semantics, and SMS failure behavior are
-approved shared v0.2 contracts. Their implementation is still pending:
+approved shared v0.2 contracts. Implementation status:
 
-- B2: Auth/JWT, password encoding, authorization, Employee provisioning.
+- B2 implemented: Auth/JWT, password encoding, authorization, Employee provisioning,
+  D-10 common auth errors. See [auth-security.md](auth-security.md).
 - B3: product/schedule public and Employee API, DTO/error projection.
 - B4/B5: final Reservation rules, configuration/price snapshots, concurrency,
   History/Loyalty, confirmation and SMS after commit.
@@ -37,8 +39,9 @@ approved shared v0.2 contracts. Their implementation is still pending:
 The existing pure Domain Foundation remains an incomplete in-memory model;
 see [domain-foundation.md](domain-foundation.md) for its limits.
 
-Backend-local choices still to make include JWT library/claims/lifetime,
-provisioning mechanism, business clock, SMS provider/retry mechanics,
+Local startup now also requires JWT_SECRET (at least 32 UTF-8 bytes).
+JWT_EXPIRES_IN_SECONDS defaults to 3600; Employee bootstrap is opt-in.
+Backend-local choices still to make include business clock, SMS provider/retry mechanics,
 transaction/locking strategy, and deployment. These are implementation decisions,
 not unresolved shared contracts.
 

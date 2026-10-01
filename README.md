@@ -13,7 +13,9 @@ Package responsibilities and persistence setup are described in
 [`docs/backend-architecture.md`](docs/backend-architecture.md) and
 [`docs/persistence-foundation.md`](docs/persistence-foundation.md).
 Local application startup requires an existing MySQL database and credentials
-provided through `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD`.
+provided through `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD`, plus `JWT_SECRET`
+(at least 32 UTF-8 bytes). Authentication and optional Employee provisioning are
+documented in [docs/auth-security.md](docs/auth-security.md).
 Tests use the H2 test profile and require no external MySQL server.
 
 Build and test with the Maven Wrapper:

@@ -9,3 +9,16 @@ spring:
     open-in-view: false
   flyway:
     enabled: true
+
+security:
+  jwt:
+    secret: ${JWT_SECRET:}
+    expires-in-seconds: ${JWT_EXPIRES_IN_SECONDS:3600}
+employee:
+  bootstrap:
+    enabled: ${EMPLOYEE_BOOTSTRAP_ENABLED:false}
+    login-id: ${EMPLOYEE_LOGIN_ID:}
+    password: ${EMPLOYEE_PASSWORD:}
+    name: ${EMPLOYEE_NAME:}
+    address: ${EMPLOYEE_ADDRESS:}
+    contact: ${EMPLOYEE_CONTACT:}
