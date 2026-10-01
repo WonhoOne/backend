@@ -39,8 +39,9 @@ until the database assigns the ID.
 String storage sizes are Backend-local: login_id, password_hash, name and contact
 255; address 500; description 2000. These are storage bounds, not new public DTO
 rules. B2/B3 must coordinate request validation/storage limits before API writes.
-Login ID case comparison follows the deployed MySQL collation; H2 uniqueness
-tests cover exact duplicates only. Case policy/collation needs explicit review in B2.
+B2 canonicalizes login IDs with trim + Locale.ROOT lowercase before storage/lookup.
+Existing accounts receive a transactional startup compatibility pass; canonical
+collisions fail startup. See [auth-security.md](auth-security.md).
 
 Currency is not stored per style-price row because v0.2 has only KRW; a later API
 projection must still return currency=KRW. Theme/Style eligibility and completeness

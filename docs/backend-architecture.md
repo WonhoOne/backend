@@ -15,11 +15,15 @@ Under `com.wonhoone.misterworld`:
 | domain | Pure Java business rules and approved value catalogs |
 | application | Use-case coordination; existing in-memory reservation example |
 | application.port | External capability boundary: SmsSender |
+| application.auth | Signup/login, credential normalization and Employee bootstrap |
+| api.controller / api.dto | HTTP mappings, validated requests and safe response projections |
+| api.error | D-10 error bodies, validation and exception mapping |
+| security | Visible endpoint boundaries, JWT issue/validation and principal mapping |
 | infrastructure.persistence.entity | JPA identity, columns, and database relationships |
 | infrastructure.persistence.repository | Direct Spring Data access to persisted records |
 
-API, security, config, and infrastructure.sms packages will appear when their
-actual implementations are added. No empty packages are created in B0/B1.
+B2 adds API/security packages with concrete authentication implementations.
+infrastructure.sms remains deferred.
 
 ## Domain object and JPA entity
 
@@ -35,7 +39,8 @@ mapping is implied.
 
 ## Expected request flow
 
-Future flow: Controller → Application Service → Domain Rule →
+Auth flow is implemented as described in [auth-security.md](auth-security.md).
+Future business flow: Controller → Application Service → Domain Rule →
 Persistence Repository → DB. Application services will own transaction boundaries
 and explicitly construct/provide the data needed by domain rules. Controllers
 will handle DTO and HTTP concerns. Exact new class names are intentionally left

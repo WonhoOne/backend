@@ -9,3 +9,12 @@ spring:
       ddl-auto: validate
   flyway:
     enabled: true
+
+# Deterministic test-only key; never use this profile/key outside tests.
+security:
+  jwt:
+    secret: test-only-key-for-auth-tests-at-least-32-bytes
+    expires-in-seconds: 3600
+employee:
+  bootstrap:
+    enabled: false

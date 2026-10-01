@@ -64,6 +64,11 @@ public class UserAccountJpaEntity {
         return loginId;
     }
 
+    /** Startup compatibility update only; account identity and credentials are preserved. */
+    public void canonicalizeLoginId(String canonicalLoginId) {
+        this.loginId = Objects.requireNonNull(canonicalLoginId);
+    }
+
     public String getPasswordHash() {
         return passwordHash;
     }
