@@ -34,18 +34,22 @@ Theme/Style eligibility. These models have no database identity.
 ## Known gaps for subsequent work
 
 - B4 implements party/configuration/transport policies, pricing and snapshots; see
-  [reservation-domain-persistence.md](reservation-domain-persistence.md). Final create orchestration is B5.
+  [reservation-domain-persistence.md](reservation-domain-persistence.md). B5 implements final create orchestration.
 - The minimal pure TourProduct stores only Theme; product identity, name,
   description and style prices now exist in separate JPA models.
 - Public recruitment is a defined v0.2 projection; coupleCount is derived rather
-  than an independent input/entity. API projection is deferred to B3/B5.
+  than an independent input/entity. B5 connects persisted aggregates through the
+  shared pure TourScheduleRecruitmentPolicy.
 - Price, Loyalty eligibility and historical snapshot persistence are implemented
-  by B4; Reservation/History REST and final transaction coordination remain B5/B6.
+  by B4; B5 implements Reservation REST and final transaction coordination. History REST remains B6.
 - B3 implements BR-30 from approved docs/main `c38995d1c33eabc73c2378335a1536b0d9ae4b1e`:
   startDate must be after Backend business date; confirmation does not close intake.
   See [tour-catalog-schedule-api.md](tour-catalog-schedule-api.md). B5 reuses this policy.
 
 ## Notification boundary
+
+The persisted B5 flow exposes scheduleJustConfirmed internally for B8 after-commit
+handling. See [reservation-api-concurrency.md](reservation-api-concurrency.md).
 
 The existing service is a synchronous foundation example, not the final v0.2
 SMS workflow. It neither deduplicates Customer recipients nor isolates delivery

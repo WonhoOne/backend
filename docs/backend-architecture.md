@@ -17,7 +17,7 @@ Under `com.wonhoone.misterworld`:
 | application.port | External capability boundary: SmsSender |
 | application.auth | Signup/login, credential normalization and Employee bootstrap |
 | application.tour | Product query/command coordination, write validation and DTO projections |
-| application.reservation | Loyalty eligibility foundation; final create orchestration remains B5 |
+| application.reservation | Reservation create/detail, semantic validation, snapshots, Loyalty and response projection |
 | application.time / config | Shared business-date provider and configurable business Clock |
 | api.controller / api.dto | HTTP mappings, validated requests and safe response projections |
 | api.error | D-10 error bodies, validation and exception mapping |
@@ -33,6 +33,10 @@ B4 adds pure Reservation rules, snapshot persistence and Loyalty eligibility, an
 enforces BR-31 in Employee Product PUT. See
 [reservation-domain-persistence.md](reservation-domain-persistence.md).
 infrastructure.sms remains deferred.
+
+B5 implements the ordered Reservation write transaction with Schedule pessimistic
+locking, persisted recruitment and first confirmation, plus ownership-scoped reads.
+See [reservation-api-concurrency.md](reservation-api-concurrency.md).
 
 ## Domain object and JPA entity
 

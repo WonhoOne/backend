@@ -22,6 +22,8 @@ default Asia/Seoul), and the presentation walkthrough are documented in
 [docs/tour-catalog-schedule-api.md](docs/tour-catalog-schedule-api.md).
 B4 domain rules, snapshots, Loyalty and the B5/B6 integration boundaries are in
 [docs/reservation-domain-persistence.md](docs/reservation-domain-persistence.md).
+Reservation REST, ownership, Schedule locking and recruitment/confirmation are in
+[docs/reservation-api-concurrency.md](docs/reservation-api-concurrency.md).
 
 Build and test with the Maven Wrapper:
 

@@ -18,7 +18,7 @@ The legacy pure `Reservation` delegates its base range to this policy, and pure
 
 `TourConfiguration` is a pure immutable value: Style, Hotel, Transport, Meal and
 an unordered unique Extra set. The collection factory rejects duplicates and null
-entries before creating a defensive immutable set. B5 must pass the original
+entries before creating a defensive immutable set. B5 passes the original
 request List to `create`; converting it to a Set first would hide invalid duplicates.
 The Set constructor also copies its input; callers cannot mutate stored selection.
 
@@ -51,8 +51,8 @@ Honeymoon pricing also uses participants. Options do not enter the calculator.
 The positive BigInteger intermediate in `loyaltyAmount` explicitly floors integer
 KRW division without overflowing when subtotal fits BIGINT. 101 KRW becomes a
 5 KRW discount and 96 KRW total. An eligible subtotal under 20 still records Loyalty
-with a zero amount. Multiplication overflow raises ArithmeticException; B5 must
-review public error mapping without inventing a new shared price maximum or code.
+with a zero amount. Multiplication overflow raises ArithmeticException; B5 maps
+it through the safe 500 INTERNAL_ERROR handler and rolls back without a new maximum or code.
 
 `DiscountSnapshot` validates the sole supported type/rate and nonnegative amount.
 `ReservationPriceSnapshot` validates KRW, money ranges, the exact rounded Loyalty
@@ -65,7 +65,7 @@ Reservations whose **current persisted Schedule confirmed is true** and whose
 **historical scheduleEndDateSnapshot is strictly before today's business date**.
 Same-day endings, future endings and unconfirmed past trips do not qualify. One
 completed trip suffices; other Customers' trips never qualify the current owner.
-B5 must call eligibility **before saving the new Reservation** inside its create
+B5 calls eligibility **before saving the new Reservation** inside its create
 transaction so the new row cannot qualify itself.
 
 ## What the snapshots preserve
@@ -130,23 +130,22 @@ with Product writes if concurrent Schedule insertion is introduced.
 
 ## B5 and B6 integration boundaries
 
-B5 create flow should resolve the authenticated CUSTOMER and Schedule, validate current
-reservability, validate party/configuration, read the selected Style's current price
-through the existing StylePrice repository, query Loyalty before save, calculate price,
-capture snapshots, save, and update recruitment/confirmation within its chosen transaction
-and locking strategy. This document describes the integration order, not an implemented
-Reservation orchestration or concurrency guarantee.
-
-Reservation rows now exist, but public recruitment aggregation remains B5 work.
-`TourScheduleQueryService` still supplies currentCount=0. B5 connects persisted aggregates,
-ownership detail, Schedule locking, confirmation transition and SMS coordination.
+B5 implements ReservationCommandService's ordered READ_COMMITTED create transaction:
+authenticated Customer → Schedule PESSIMISTIC_WRITE → latest reservable check →
+semantic/domain validation → selected current Style price → Loyalty → price →
+capture → saveAndFlush → persisted aggregate → first confirmation → response.
+ReservationQueryService implements ownership-scoped detail. Public Schedule counts
+now use real persisted aggregates (one grouped query for collections), and the
+internal scheduleJustConfirmed result prepares B8's after-commit notification hook.
+See [reservation-api-concurrency.md](reservation-api-concurrency.md) for the lock
+rationale, snapshot/current response semantics and concurrency tests.
 B6 can project History from Reservation id, captured Product identity/Theme/name, captured
 dates, configuration.style and price.total/currency, together with current confirmation.
 No speculative aggregate, locking, ownership or History query methods are added in B4.
 
 The original pure `TourScheduleReservationService` remains a legacy in-memory foundation.
 Its synchronous SMS example does not implement final recipient deduplication, retry or
-failure isolation. B5/B8 connect the final persistence-backed workflow; B4 preserves it.
+failure isolation. B5's persisted flow never calls it; B8 will attach notification delivery.
 
 ## Presentation walkthrough
 

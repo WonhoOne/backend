@@ -4,11 +4,14 @@
 
 B1 provides UserAccount, TourProduct, style-price, TourSchedule, and Inventory
 storage. Shared meanings follow WonhoOne/docs main v0.2, snapshot
-`79955fc9c864ad0efce6dee9db2319e684573e7a`.
+`cad8daed210cfb60078f24cabe14c2f383f3ef65`.
 The shared ERD is logical; it is not a one-to-one physical schema prescription.
 B4 adds Reservation configuration/price and historical Product/date snapshots in
 V3; see [reservation-domain-persistence.md](reservation-domain-persistence.md).
 History is a later projection over these records, not a separate table.
+B5 connects Reservation REST and persisted Schedule aggregates using a target-row
+pessimistic lock and READ_COMMITTED create transaction. No migration is added;
+see [reservation-api-concurrency.md](reservation-api-concurrency.md).
 
 ## Schema ownership and migration policy
 

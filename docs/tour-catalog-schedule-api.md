@@ -70,7 +70,7 @@ BusinessDateProvider.today uses LocalDate.now(clock). A collection takes one
 business date for all its items, avoiding inconsistent results across midnight.
 Tests replace businessClock with a fixed Clock at business date 2026-10-01 and
 also check a UTC/Seoul date boundary. Travel History and Loyalty can reuse this
-provider. B5 Reservation creation must obtain the latest date and revalidate
+provider. B5 Reservation creation obtains the latest date after locking and revalidates
 the same pure policy, regardless of a previously read DTO.
 
 TourScheduleReservabilityPolicy contains the complete BR-30 rule:
@@ -86,13 +86,14 @@ recruitment unit, and persisted confirmed. Honeymoon uses COUPLE_TEAM and requir
 count 2; the other themes use PARTICIPANT and required count 3. The projection
 preserves persisted confirmation rather than recomputing it from the count.
 
-B4 now has persisted Reservation foundations, but public recruitment still has
-currentCount=0 until B5. TourScheduleQueryService supplies this count at one projection
-boundary; zero is not a permanent business rule. B5 should query real Reservation
-aggregates (couple/team counts for Honeymoon, participants otherwise) and feed
-the same projection, using a batch aggregate for collections. A confirmed test
-fixture may deliberately have count zero to verify independent projections;
-B3 does not create or reconcile confirmation state.
+B5 connects real persisted Reservation participant sums. TourScheduleQueryService
+uses one grouped aggregate query for collection IDs and one SUM for detail.
+TourScheduleRecruitmentPolicy converts participants into Honeymoon couple/teams,
+and ScheduleRecruitmentProjection delegates unit/required count to that same pure
+policy. A confirmed fixture may deliberately have count zero to verify that
+projection preserves persisted state. B5 create transactions own first confirmation;
+read APIs do not reconcile or mutate it. See
+[reservation-api-concurrency.md](reservation-api-concurrency.md).
 
 ## Errors and diagnostic logging
 
@@ -123,8 +124,9 @@ excluded from this handler's log.
 V1/V2 remain immutable. B3 added no migration; B4 adds V3 for Reservation snapshots.
 There is no demo product/schedule seed.
 At the original B3 gate Reservation persistence and snapshots/Loyalty were deferred.
-B4 implements those foundations and BR-31. Reservation API, History REST, Inventory
-API/mutation, SMS, schedule CRUD/capacity/close/cancel and pagination remain outside B4.
+B4 implements those foundations and BR-31; B5 implements Reservation API, locking,
+recruitment and confirmation. History REST, Inventory API/mutation, SMS,
+schedule CRUD/capacity/close/cancel and pagination remain deferred.
 H2 MySQL-mode tests execute Flyway and schema validation and exercise the real
 SecurityFilterChain. Real MySQL collation and concurrent signup mapping remain
 integration/hardening work; H2 does not prove those engine properties.
