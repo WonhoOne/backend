@@ -53,19 +53,23 @@ B7 implements Inventory reads/adds over B1's fixed catalog. InventoryItemType
 remains a pure canonical enum; InventoryJpaEntity.addQuantity enforces positive
 amounts and checked long addition. InventoryCommandService owns the target-row
 lock and write transaction. No stock deduction or Reservation coupling is added.
-See [inventory-api.md](inventory-api.md). B8 SMS and B9 hardening remain.
+See [inventory-api.md](inventory-api.md). B8 SMS is implemented separately;
+B9 hardening remains.
 
 ## Notification boundary
 
-The persisted B5 flow exposes scheduleJustConfirmed internally for B8 after-commit
-handling. See [reservation-api-concurrency.md](reservation-api-concurrency.md).
+The persisted B5 flow exposes scheduleJustConfirmed internally. B8 now captures
+the durable event/recipients at that first transition and dispatches after commit.
+See [sms-confirmation-delivery.md](sms-confirmation-delivery.md).
 
 The existing service is a synchronous foundation example, not the final v0.2
 SMS workflow. It neither deduplicates Customer recipients nor isolates delivery
 failures or stores retryable notifications. The shared failure policy is already
 approved: see the SSOT SMS section. Subsequent confirmation integration must add
 transaction/after-commit handling, recipient identity, retry state and a real
-provider. These behaviors are not supplied by B0/B1.
+provider. B8 supplies those behaviors in the persisted workflow, never by calling
+this legacy service. The foundation and its tests only adapt to the evolved
+SmsSender.send(SmsMessage) → SmsSendResult signature.
 
 ## Why preserve the pure model
 

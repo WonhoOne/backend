@@ -15,6 +15,8 @@ Under `com.wonhoone.misterworld`:
 | domain | Pure Java business rules and approved value catalogs |
 | application | Use-case coordination; existing in-memory reservation example |
 | application.port | External capability boundary: SmsSender |
+| application.sms | Confirmation outbox capture, after-commit signal, per-recipient delivery and durable retry |
+| infrastructure.sms.solapi | SOLAPI REST requests, HMAC authentication and safe acceptance parsing |
 | application.auth | Signup/login, credential normalization and Employee bootstrap |
 | application.tour | Product query/command coordination, write validation and DTO projections |
 | application.reservation | Reservation create/detail, semantic validation, snapshots, Loyalty and Travel History projection |
@@ -33,7 +35,7 @@ pure reservability policy and recruitment projection. See
 B4 adds pure Reservation rules, snapshot persistence and Loyalty eligibility, and
 enforces BR-31 in Employee Product PUT. See
 [reservation-domain-persistence.md](reservation-domain-persistence.md).
-infrastructure.sms remains deferred.
+infrastructure.sms.solapi implements the B8 provider-independent SmsSender port.
 
 B5 implements the ordered Reservation write transaction with Schedule pessimistic
 locking, persisted recruitment and first confirmation, plus ownership-scoped reads.
@@ -46,7 +48,15 @@ See [travel-history.md](travel-history.md).
 B7 connects EmployeeInventoryController to InventoryQueryService / InventoryCommandService,
 the existing Inventory repository and checked Entity mutation. The Command transaction
 locks only the target catalog row and flushes before returning the DTO. See
-[inventory-api.md](inventory-api.md). B8 SMS and B9 hardening remain.
+[inventory-api.md](inventory-api.md). B8 adds the durable SMS path described in
+[sms-confirmation-delivery.md](sms-confirmation-delivery.md); B9 hardening remains.
+
+B8 captures event/recipient snapshots within the Reservation transaction. The
+AFTER_COMMIT listener submits to a small executor; the dispatcher invokes a
+separate REQUIRES_NEW recipient delivery transaction with PESSIMISTIC_WRITE.
+The poller discovers due PENDING rows independently of signals. Application code
+knows SmsSender/SmsMessage/SmsSendResult; only the SOLAPI adapter knows the REST
+protocol. No new public API or dependency is introduced.
 
 ## Domain object and JPA entity
 

@@ -2,7 +2,8 @@
 
 Backend-local implementation for FR-04/05/06/07/08/15, NFR-02/06 and
 BR-03/04/06/07/13/15/18/19/20/21/22/23/26/30/31. BR-14/27's first-confirmation
-boundary is prepared; delivery belongs to B8. Approved shared reference:
+boundary is integrated by B8; see [sms-confirmation-delivery.md](sms-confirmation-delivery.md).
+Approved shared reference:
 [Baseline v0.2](https://github.com/WonhoOne/docs/blob/cad8daed210cfb60078f24cabe14c2f383f3ef65/baseline/BASELINE-v0.2.md),
 [REST contract](https://github.com/WonhoOne/docs/blob/cad8daed210cfb60078f24cabe14c2f383f3ef65/api/api-spec-draft.md)
 and [business rules](https://github.com/WonhoOne/docs/blob/cad8daed210cfb60078f24cabe14c2f383f3ef65/requirements/business-rules.md).
@@ -39,7 +40,10 @@ Read `ReservationCommandService.create` from top to bottom:
 12. TourScheduleRecruitmentPolicy converts the participant sum into the Theme's unit.
 13. If the threshold is reached, markConfirmed changes false to true only once.
 14. Flush Schedule state so an update failure rolls back the whole transaction.
-15. ReservationResponseFactory combines snapshots and current recruitment into the DTO.
+15. B8 calls ScheduleConfirmationOutboxService.capture only when scheduleJustConfirmed:
+    DISTINCT recipients/current contact + message snapshots, event/recipient flush,
+    internal signal publication, all inside the same transaction.
+16. ReservationResponseFactory combines snapshots and current recruitment into the DTO.
 
 Bean Validation supplies REQUIRED and OUT_OF_RANGE at top-level/nested paths.
 Semantic validation supplies participantCount NOT_ALLOWED, configuration.style
@@ -99,13 +103,14 @@ false to true. ReservationCreationResult carries response + scheduleJustConfirme
 the boolean never enters public JSON. A later Reservation on a confirmed Schedule
 returns false even while recruitment keeps growing.
 
-B5 creates the reliable transition boundary; B8 attaches notification semantics.
-B8 should attach an event/hook within this transaction and handle notification
-after commit, rather than send SMS from the controller or infer transitions from
-public confirmed=true. The returned result becomes available to the controller
-only after a successful transaction commit. B5 publishes no event, sends no SMS,
-collects no recipients and adds no outbox/provider/retry. The legacy in-memory
-TourScheduleReservationService is not called by the persisted flow.
+B5 creates the reliable transition boundary; B8 captures its event inside this
+transaction and handles notification after commit. The controller does not send
+SMS or infer transitions from public confirmed=true. The returned result becomes available to the controller
+only after a successful transaction commit. B5 itself added no notification
+persistence/provider. B8 now publishes the signal after durable capture and
+handles external delivery only after commit, using a separate recipient
+transaction. The legacy in-memory TourScheduleReservationService is not called
+by the persisted flow. Public response fields remain unchanged.
 
 ## GET ownership and response semantics
 
@@ -162,8 +167,9 @@ show the same-Schedule lock test: one row lock, serialized creates, one first tr
 
 Actual MySQL 8 PESSIMISTIC_WRITE, waiting/isolation behavior, CHECK and FK/index
 semantics remain unverified. H2 success is not proof of those engine properties;
-no Docker/Testcontainers is added here. V1/V2/V3 are unchanged and there is no V4.
+no Docker/Testcontainers is added here. V1/V2/V3 are unchanged; B8 appends V4.
 B6 implements History REST over snapshots. B7 implements Inventory REST separately
 without Reservation stock coupling; see [inventory-api.md](inventory-api.md).
-SMS delivery (B8), schedule CRUD/capacity/manual
-close, Reservation update/cancel, payment/refund and idempotency remain deferred.
+SMS delivery (B8) is implemented; actual MySQL/provider hardening remains B9.
+Schedule CRUD/capacity/manual close, Reservation update/cancel, payment/refund
+and idempotency remain deferred.
