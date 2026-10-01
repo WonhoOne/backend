@@ -1,6 +1,8 @@
 package com.wonhoone.misterworld.infrastructure.persistence.repository;
 
 import com.wonhoone.misterworld.infrastructure.persistence.entity.ReservationJpaEntity;
+import com.wonhoone.misterworld.domain.Theme;
+import com.wonhoone.misterworld.domain.TourStyle;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -42,4 +44,36 @@ public interface ReservationJpaRepository extends JpaRepository<ReservationJpaEn
               and reservation.scheduleEndDateSnapshot < :businessDate
             """)
     long countCompletedTrips(@Param("customerId") long customerId, @Param("businessDate") LocalDate businessDate);
+
+    /** Same completed predicate as Loyalty: current confirmation, historical period. No option collections are loaded. */
+    @Query("""
+            select reservation.id as reservationId,
+                   reservation.tourProductIdSnapshot as tourProductId,
+                   reservation.tourProductThemeSnapshot as tourProductTheme,
+                   reservation.tourProductNameSnapshot as tourProductName,
+                   reservation.scheduleStartDateSnapshot as startDate,
+                   reservation.scheduleEndDateSnapshot as endDate,
+                   reservation.configuration.style as style,
+                   reservation.price.total as priceAmount,
+                   reservation.price.currency as currency
+            from ReservationJpaEntity reservation
+            where reservation.customer.id = :customerId
+              and reservation.tourSchedule.confirmed = true
+              and reservation.scheduleEndDateSnapshot < :businessDate
+            order by reservation.scheduleEndDateSnapshot desc, reservation.id desc
+            """)
+    List<TravelHistoryRow> findTravelHistory(@Param("customerId") long customerId,
+                                            @Param("businessDate") LocalDate businessDate);
+
+    interface TravelHistoryRow {
+        long getReservationId();
+        long getTourProductId();
+        Theme getTourProductTheme();
+        String getTourProductName();
+        LocalDate getStartDate();
+        LocalDate getEndDate();
+        TourStyle getStyle();
+        long getPriceAmount();
+        String getCurrency();
+    }
 }
