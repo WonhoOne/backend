@@ -40,7 +40,7 @@ public class TourScheduleQueryService {
 
     private TourScheduleResponse project(TourScheduleJpaEntity schedule, LocalDate today) {
         var product = schedule.getTourProduct();
-        // B3 has no persisted Reservation feature. B5 supplies real aggregate counts at this boundary.
+        // B4 stores Reservation snapshots; B5 connects real recruitment aggregates at this boundary.
         long currentCount = 0;
         return new TourScheduleResponse(schedule.getId(), product.getId(), schedule.getStartDate(),
                 schedule.getEndDate(), TourScheduleReservabilityPolicy.isReservable(schedule.getStartDate(), today),

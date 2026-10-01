@@ -3,7 +3,7 @@
 ## Status and scope
 
 Backend Internal Approved Decision. Shared contracts are defined by
-[WonhoOne/docs main v0.2](https://github.com/WonhoOne/docs/blob/79955fc9c864ad0efce6dee9db2319e684573e7a/baseline/BASELINE-v0.2.md).
+[WonhoOne/docs main v0.2](https://github.com/WonhoOne/docs/blob/cad8daed210cfb60078f24cabe14c2f383f3ef65/baseline/BASELINE-v0.2.md).
 This document records implementation status, not a duplicate API contract.
 
 ## Technology decisions
@@ -34,8 +34,11 @@ approved shared v0.2 contracts. Implementation status:
 - B3 implemented: public product/schedule reads, Employee product writes,
   DTO/error projection, business date and reservability. See
   [tour-catalog-schedule-api.md](tour-catalog-schedule-api.md).
-- B4/B5: final Reservation rules, configuration/price snapshots, concurrency,
-  History/Loyalty, confirmation and SMS after commit.
+- B4 implemented: Reservation party/configuration/price rules, Loyalty eligibility,
+  snapshot persistence and BR-31 Theme lock. See
+  [reservation-domain-persistence.md](reservation-domain-persistence.md).
+- B5/B6/B8: Reservation REST, concurrency, recruitment aggregation/confirmation,
+  History REST and SMS integration.
 - Later use cases: atomic Inventory addition and provider integration.
 
 The existing pure Domain Foundation remains an incomplete in-memory model;

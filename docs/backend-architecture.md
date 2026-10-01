@@ -3,7 +3,7 @@
 ## Contract and implementation boundary
 
 Shared reference: WonhoOne/docs main Baseline v0.2 at
-`79955fc9c864ad0efce6dee9db2319e684573e7a`.
+`cad8daed210cfb60078f24cabe14c2f383f3ef65`.
 This document describes Backend-local organization only.
 
 ## Package responsibilities
@@ -17,6 +17,7 @@ Under `com.wonhoone.misterworld`:
 | application.port | External capability boundary: SmsSender |
 | application.auth | Signup/login, credential normalization and Employee bootstrap |
 | application.tour | Product query/command coordination, write validation and DTO projections |
+| application.reservation | Loyalty eligibility foundation; final create orchestration remains B5 |
 | application.time / config | Shared business-date provider and configurable business Clock |
 | api.controller / api.dto | HTTP mappings, validated requests and safe response projections |
 | api.error | D-10 error bodies, validation and exception mapping |
@@ -28,11 +29,14 @@ B2 adds API/security packages with concrete authentication implementations.
 B3 implements product/schedule flows with separate query/command services,
 pure reservability policy and recruitment projection. See
 [tour-catalog-schedule-api.md](tour-catalog-schedule-api.md) for the walkthrough.
+B4 adds pure Reservation rules, snapshot persistence and Loyalty eligibility, and
+enforces BR-31 in Employee Product PUT. See
+[reservation-domain-persistence.md](reservation-domain-persistence.md).
 infrastructure.sms remains deferred.
 
 ## Domain object and JPA entity
 
-Domain object != JPA Entity. The pure models remain unchanged; new persistence
+Domain object != JPA Entity. Pure models delegate party validation to B4's policy; new persistence
 classes carry the JpaEntity suffix and depend on domain enums, not vice versa.
 Business-rule presentation stays free of ORM lifecycle details, and mapping
 changes do not force a rewrite of the pure model.

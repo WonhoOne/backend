@@ -6,7 +6,9 @@ B1 provides UserAccount, TourProduct, style-price, TourSchedule, and Inventory
 storage. Shared meanings follow WonhoOne/docs main v0.2, snapshot
 `79955fc9c864ad0efce6dee9db2319e684573e7a`.
 The shared ERD is logical; it is not a one-to-one physical schema prescription.
-Reservation, configuration/price snapshots and History storage are deferred.
+B4 adds Reservation configuration/price and historical Product/date snapshots in
+V3; see [reservation-domain-persistence.md](reservation-domain-persistence.md).
+History is a later projection over these records, not a separate table.
 
 ## Schema ownership and migration policy
 
@@ -53,8 +55,9 @@ Spring Data JpaRepository. Constructors accept required storage values with basi
 null/range checks; no public setters or speculative Inventory behavior are added.
 UserAccount receives an already encoded passwordHash; B1 does not encode passwords.
 
-No reservable or recruitment-count columns are stored. No Reservation table,
-JWT table, History table, SMS outbox, demo users/products/schedules are introduced.
+No reservable or recruitment-count columns are stored. B4 adds Reservation tables
+in V3 without changing V1/V2. No JWT table, History table, SMS outbox or demo
+users/products/schedules are introduced.
 
 ## Inventory initialization
 
@@ -71,7 +74,7 @@ no real credentials are tracked. Flyway creates tables inside the existing datab
 MySQL 8.0.16 or later is required for enforced CHECK constraints.
 
 The test profile overrides every datasource credential/URL and driver with H2
-in-memory MySQL mode. Tests execute the same V1/V2 scripts and Hibernate validate,
+in-memory MySQL mode. Tests execute the same V1/V2/V3 scripts and Hibernate validate,
 not Hibernate create or H2-only substitute migrations. Persistence tests run in
 rolled-back transactions; pure domain tests remain Spring-free.
 

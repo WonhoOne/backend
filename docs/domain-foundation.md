@@ -4,8 +4,8 @@
 
 The existing pure Java model preserves its original business-rule foundation.
 The current approved reference is
-[WonhoOne/docs main Baseline v0.2](https://github.com/WonhoOne/docs/blob/79955fc9c864ad0efce6dee9db2319e684573e7a/baseline/BASELINE-v0.2.md),
-snapshot `79955fc9c864ad0efce6dee9db2319e684573e7a`.
+[WonhoOne/docs main Baseline v0.2](https://github.com/WonhoOne/docs/blob/cad8daed210cfb60078f24cabe14c2f383f3ef65/baseline/BASELINE-v0.2.md),
+snapshot `cad8daed210cfb60078f24cabe14c2f383f3ef65`.
 Requirements, Domain Model and Business Rules at that snapshot remain the SSOT.
 
 This foundation does **not** implement all v0.2 rules or public API behavior.
@@ -25,21 +25,22 @@ BR-12, BR-13, BR-14. This is partial support, not completion of those requiremen
 - New `UserRole` and `InventoryItemType` enums express approved shared values;
   they contain no persistence annotations.
 
-`Reservation` currently validates only participantCount >= 1.
-`TourSchedule` additionally validates Honeymoon even counts >= 2, derives
+`Reservation` delegates the 1..10 base range to `ReservationPartyPolicy`.
+`TourSchedule` delegates Theme-specific validation (Honeymoon 2/4/6/8/10), derives
 couple/team count, and confirms at two couples/teams or three general participants.
 Its collection access returns immutable snapshots. `TourStylePolicy` validates
 Theme/Style eligibility. These models have no database identity.
 
 ## Known gaps for subsequent work
 
-- B4 must add the v0.2 maximum of 10 and final configuration/transport validation.
+- B4 implements party/configuration/transport policies, pricing and snapshots; see
+  [reservation-domain-persistence.md](reservation-domain-persistence.md). Final create orchestration is B5.
 - The minimal pure TourProduct stores only Theme; product identity, name,
   description and style prices now exist in separate JPA models.
 - Public recruitment is a defined v0.2 projection; coupleCount is derived rather
   than an independent input/entity. API projection is deferred to B3/B5.
-- Price, Loyalty and historical snapshots are approved contracts, with
-  implementation deferred to Reservation/History work.
+- Price, Loyalty eligibility and historical snapshot persistence are implemented
+  by B4; Reservation/History REST and final transaction coordination remain B5/B6.
 - B3 implements BR-30 from approved docs/main `c38995d1c33eabc73c2378335a1536b0d9ae4b1e`:
   startDate must be after Backend business date; confirmation does not close intake.
   See [tour-catalog-schedule-api.md](tour-catalog-schedule-api.md). B5 reuses this policy.

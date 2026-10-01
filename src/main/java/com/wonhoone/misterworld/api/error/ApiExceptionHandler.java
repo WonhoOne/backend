@@ -15,6 +15,11 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 public class ApiExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(ApiExceptionHandler.class);
 
+    @ExceptionHandler(ResourceConflictException.class)
+    ResponseEntity<ApiError> conflict(ResourceConflictException exception) {
+        return ResponseEntity.status(409).body(ApiError.of(exception.code(), exception.getMessage()));
+    }
+
     @ExceptionHandler(ResourceNotFoundException.class)
     ResponseEntity<ApiError> notFound(ResourceNotFoundException exception) {
         return ResponseEntity.status(404).body(ApiError.of(exception.code(), exception.getMessage()));
