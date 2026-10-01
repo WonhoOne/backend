@@ -42,7 +42,9 @@ approved shared v0.2 contracts. Implementation status:
   See [reservation-api-concurrency.md](reservation-api-concurrency.md).
 - B6 implemented: CUSTOMER History REST over Reservation scalar snapshots.
   See [travel-history.md](travel-history.md).
-- B7 Inventory, B8 after-commit SMS/provider integration and B9 integration/hardening remain.
+- B7 implemented: EMPLOYEE Inventory REST, fixed catalog reads and atomic adds
+  with target-row locking and checked overflow. See [inventory-api.md](inventory-api.md).
+- B8 after-commit SMS/provider integration and B9 integration/hardening remain.
 
 The existing pure Domain Foundation remains an incomplete in-memory model;
 see [domain-foundation.md](domain-foundation.md) for its limits.
@@ -50,8 +52,9 @@ see [domain-foundation.md](domain-foundation.md) for its limits.
 Local startup now also requires JWT_SECRET (at least 32 UTF-8 bytes).
 JWT_EXPIRES_IN_SECONDS defaults to 3600; Employee bootstrap is opt-in.
 Business date defaults to Asia/Seoul (BUSINESS_TIME_ZONE override).
-Backend-local choices still to make include SMS provider/retry mechanics,
-Inventory transaction/locking strategy, and deployment. These are implementation decisions,
+Inventory uses a write transaction with PESSIMISTIC_WRITE on the target row and
+Math.addExact for checked long addition. Backend-local choices still to make include
+SMS provider/retry mechanics and deployment. These are implementation decisions,
 not unresolved shared contracts.
 
 ## Documentation boundary

@@ -175,7 +175,8 @@ enum string collation, FK/index behavior or transaction/concurrency behavior. Va
 these during later integration/hardening; no Docker/Testcontainers dependency is added.
 Reservation REST/DTOs, concurrency/locking, actual recruitment aggregates, confirmation
 transitions and History REST were outside B4 and are now implemented by B5/B6.
-B7 Inventory, B8 SMS delivery/outbox and B9 integration/hardening remain; update/cancel/
+B7 Inventory is implemented independently; see [inventory-api.md](inventory-api.md).
+B8 SMS delivery/outbox and B9 integration/hardening remain; update/cancel/
 payment and idempotency are outside this scope. No Shared Contract blocker was found.
 
 Local verification: the original main baseline passed 152 tests. B4 adds 77 scenarios

@@ -167,4 +167,5 @@ missing config, preserving existing accounts and legacy canonical collisions.
 JWT configuration tests cover missing/short secrets and configured seconds.
 
 TourProduct/TourSchedule (B3), Reservation (B5) and Travel History (B6) APIs are now
-implemented. Next gates are B7 Inventory, B8 SMS and B9 integration/hardening.
+implemented. B7 Inventory uses the existing EMPLOYEE security boundary; see
+[inventory-api.md](inventory-api.md). Next gates are B8 SMS and B9 integration/hardening.

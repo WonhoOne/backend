@@ -47,6 +47,14 @@ Theme/Style eligibility. These models have no database identity.
   startDate must be after Backend business date; confirmation does not close intake.
   See [tour-catalog-schedule-api.md](tour-catalog-schedule-api.md). B5 reuses this policy.
 
+## Inventory boundary
+
+B7 implements Inventory reads/adds over B1's fixed catalog. InventoryItemType
+remains a pure canonical enum; InventoryJpaEntity.addQuantity enforces positive
+amounts and checked long addition. InventoryCommandService owns the target-row
+lock and write transaction. No stock deduction or Reservation coupling is added.
+See [inventory-api.md](inventory-api.md). B8 SMS and B9 hardening remain.
+
 ## Notification boundary
 
 The persisted B5 flow exposes scheduleJustConfirmed internally for B8 after-commit

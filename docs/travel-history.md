@@ -102,7 +102,8 @@ then show Product/date edit tests:
 
 ## Remaining gates
 
-B7 Inventory, B8 actual SMS provider/after-commit delivery and B9 integration/
+B7 Inventory is implemented; see [inventory-api.md](inventory-api.md).
+B8 actual SMS provider/after-commit delivery and B9 integration/
 hardening remain. H2 tests exercise the real SecurityFilterChain, Flyway and
 Hibernate validation; they do not establish actual MySQL plans or engine behavior.
 History detail, filtering/pagination, Reservation update/cancel and payment remain
