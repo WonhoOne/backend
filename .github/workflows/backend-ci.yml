@@ -40,3 +40,56 @@ jobs:
 
       - name: Build package
         run: ./mvnw --batch-mode --no-transfer-progress package
+
+  mysql-integration:
+    name: Actual MySQL 8 InnoDB validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: misterworld
+          MYSQL_USER: misterworld
+          MYSQL_PASSWORD: b9-test-only-password
+          MYSQL_ROOT_PASSWORD: b9-test-only-root-password
+          TZ: UTC
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 --silent"
+          --health-interval=5s
+          --health-timeout=3s
+          --health-retries=30
+          --health-start-period=20s
+    env:
+      # Ephemeral service credentials only; no repository secrets or SOLAPI settings.
+      DB_URL: jdbc:mysql://127.0.0.1:3306/misterworld?useSSL=false&allowPublicKeyRetrieval=true&connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true&connectTimeout=5000&socketTimeout=20000
+      DB_USERNAME: misterworld
+      DB_PASSWORD: b9-test-only-password
+      JWT_SECRET: b9-test-only-jwt-signing-key-at-least-32-bytes
+      SMS_DELIVERY_ENABLED: 'false'
+      EMPLOYEE_BOOTSTRAP_ENABLED: 'false'
+      B9_MYSQL_TEST_DATABASE: misterworld
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+      - name: Set up Java 21
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Validate fresh migrations, schema and row locks
+        run: |
+          chmod +x mvnw
+          ./mvnw --batch-mode --no-transfer-progress -Pmysql-integration verify
+      - name: Preserve MySQL scenario reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: b9-mysql-runtime-reports
+          path: |
+            target/failsafe-reports/
+            target/b9-mysql-runtime.txt
+          if-no-files-found: warn

@@ -1,0 +1,20 @@
+# Disposable B9-A1 test database. Every credential below is test-only, never demo/production.
+name: misterworld-b9-mysql
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: misterworld
+      MYSQL_USER: misterworld
+      MYSQL_PASSWORD: b9-test-only-password
+      MYSQL_ROOT_PASSWORD: b9-test-only-root-password
+      TZ: UTC
+    ports:
+      - "127.0.0.1:3307:3306"
+    healthcheck:
+      test: ["CMD-SHELL", "MYSQL_PWD=$$MYSQL_PASSWORD mysql --protocol=TCP -h 127.0.0.1 -u$$MYSQL_USER -D $$MYSQL_DATABASE -e 'SELECT 1' >/dev/null"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 20s
+    # No persistent volume: down -v removes only this project's disposable data.
