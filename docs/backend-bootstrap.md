@@ -44,7 +44,10 @@ approved shared v0.2 contracts. Implementation status:
   See [travel-history.md](travel-history.md).
 - B7 implemented: EMPLOYEE Inventory REST, fixed catalog reads and atomic adds
   with target-row locking and checked overflow. See [inventory-api.md](inventory-api.md).
-- B8 after-commit SMS/provider integration and B9 integration/hardening remain.
+- B8 implemented: durable confirmation event/recipient snapshots, after-commit
+  asynchronous dispatch, scheduled retry and real SOLAPI REST adapter. See
+  [sms-confirmation-delivery.md](sms-confirmation-delivery.md).
+- B9 integration/hardening remains.
 
 The existing pure Domain Foundation remains an incomplete in-memory model;
 see [domain-foundation.md](domain-foundation.md) for its limits.
@@ -53,9 +56,10 @@ Local startup now also requires JWT_SECRET (at least 32 UTF-8 bytes).
 JWT_EXPIRES_IN_SECONDS defaults to 3600; Employee bootstrap is opt-in.
 Business date defaults to Asia/Seoul (BUSINESS_TIME_ZONE override).
 Inventory uses a write transaction with PESSIMISTIC_WRITE on the target row and
-Math.addExact for checked long addition. Backend-local choices still to make include
-SMS provider/retry mechanics and deployment. These are implementation decisions,
-not unresolved shared contracts.
+Math.addExact for checked long addition. B8 selects SOLAPI and DB outbox/retry as
+Backend-local decisions. Delivery defaults off; enabling requires environment
+API credentials and a registered sender. Deployment and actual MySQL/provider
+hardening remain B9; no unresolved shared SMS contract is implied.
 
 ## Documentation boundary
 

@@ -28,7 +28,10 @@ Customer Travel History snapshot projection and its presentation walkthrough are
 [docs/travel-history.md](docs/travel-history.md).
 Employee Inventory reads and atomic additions, row locking and the presentation
 walkthrough are in [docs/inventory-api.md](docs/inventory-api.md).
-Next gates are B8 SMS and B9 integration/hardening.
+B8 durable SMS confirmation, SOLAPI setup and its presentation walkthrough are in
+[docs/sms-confirmation-delivery.md](docs/sms-confirmation-delivery.md).
+Real delivery defaults off (`SMS_DELIVERY_ENABLED=false`); outbox capture remains on.
+B8 implemented; B9 integration/hardening remains.
 
 Build and test with the Maven Wrapper:
 

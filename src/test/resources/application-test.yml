@@ -18,3 +18,8 @@ security:
 employee:
   bootstrap:
     enabled: false
+
+# Profile default; Surefire's JVM system property overrides inherited OS delivery settings.
+sms:
+  delivery:
+    enabled: false

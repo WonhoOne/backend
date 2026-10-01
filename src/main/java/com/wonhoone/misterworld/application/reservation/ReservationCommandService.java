@@ -3,6 +3,7 @@ package com.wonhoone.misterworld.application.reservation;
 import com.wonhoone.misterworld.api.dto.ReservationCreateRequest;
 import com.wonhoone.misterworld.api.error.*;
 import com.wonhoone.misterworld.application.time.BusinessDateProvider;
+import com.wonhoone.misterworld.application.sms.ScheduleConfirmationOutboxService;
 import com.wonhoone.misterworld.application.tour.ScheduleRecruitmentProjection;
 import com.wonhoone.misterworld.domain.*;
 import com.wonhoone.misterworld.infrastructure.persistence.entity.ReservationJpaEntity;
@@ -21,11 +22,13 @@ public class ReservationCommandService {
     private final LoyaltyEligibilityService loyalty;
     private final ReservationJpaRepository reservations;
     private final ReservationResponseFactory responses;
+    private final ScheduleConfirmationOutboxService outbox;
 
     public ReservationCommandService(UserAccountJpaRepository accounts, TourScheduleJpaRepository schedules,
                                      BusinessDateProvider businessDate, ReservationCreateValidator validator,
                                      TourProductStylePriceJpaRepository prices, LoyaltyEligibilityService loyalty,
-                                     ReservationJpaRepository reservations, ReservationResponseFactory responses) {
+                                     ReservationJpaRepository reservations, ReservationResponseFactory responses,
+                                     ScheduleConfirmationOutboxService outbox) {
         this.accounts = accounts;
         this.schedules = schedules;
         this.businessDate = businessDate;
@@ -34,6 +37,7 @@ public class ReservationCommandService {
         this.loyalty = loyalty;
         this.reservations = reservations;
         this.responses = responses;
+        this.outbox = outbox;
     }
 
     // READ_COMMITTED prevents the account lookup from fixing a stale aggregate snapshot before lock waiting.
@@ -65,6 +69,7 @@ public class ReservationCommandService {
         boolean scheduleJustConfirmed = TourScheduleRecruitmentPolicy.thresholdReached(product.getTheme(), currentCount)
                 && schedule.markConfirmed();
         schedules.flush();
+        if (scheduleJustConfirmed) outbox.capture(schedule);
 
         var recruitment = ScheduleRecruitmentProjection.create(product.getTheme(), currentCount, schedule.isConfirmed());
         return new ReservationCreationResult(responses.create(reservation, recruitment), scheduleJustConfirmed);

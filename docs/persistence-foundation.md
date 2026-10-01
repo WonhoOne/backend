@@ -61,8 +61,10 @@ InventoryJpaEntity.addQuantity method with positive-amount and overflow checks.
 UserAccount receives an already encoded passwordHash; B1 does not encode passwords.
 
 No reservable or recruitment-count columns are stored. B4 adds Reservation tables
-in V3 without changing V1/V2. No JWT table, History table, SMS outbox or demo
-users/products/schedules are introduced.
+in V3 without changing V1/V2. B8 appends V4 SMS event/recipient outbox tables;
+see [sms-confirmation-delivery.md](sms-confirmation-delivery.md) for their physical
+columns/constraints/indexes and UTC delivery timestamps. No JWT/History table or
+demo users/products/schedules are introduced.
 
 ## Inventory initialization
 
@@ -73,8 +75,9 @@ Entity dirty checking plus explicit flush updates the aggregate without save/ins
 Math.addExact rejects overflow before assignment; failure rolls back with safe
 INTERNAL_ERROR. A missing catalog row fails internally without a replacement.
 GET orders rows by id ASC in the repository and includes zero stock.
-V1/V2/V3 remain unchanged; Flyway stays at version 3. See
-[inventory-api.md](inventory-api.md). B8 SMS and B9 MySQL hardening remain.
+V1/V2/V3 remain unchanged. B8 appends V4; Flyway now stays at version 4. See
+[inventory-api.md](inventory-api.md) and [sms-confirmation-delivery.md](sms-confirmation-delivery.md).
+B9 MySQL hardening remains.
 
 ## Configuration and tests
 
@@ -84,7 +87,7 @@ no real credentials are tracked. Flyway creates tables inside the existing datab
 MySQL 8.0.16 or later is required for enforced CHECK constraints.
 
 The test profile overrides every datasource credential/URL and driver with H2
-in-memory MySQL mode. Tests execute the same V1/V2/V3 scripts and Hibernate validate,
+in-memory MySQL mode. Tests execute the same V1/V2/V3/V4 scripts and Hibernate validate,
 not Hibernate create or H2-only substitute migrations. Persistence tests run in
 rolled-back transactions; pure domain tests remain Spring-free.
 
