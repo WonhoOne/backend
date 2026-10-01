@@ -52,4 +52,11 @@ public class InventoryJpaEntity {
     public long getQuantity() {
         return quantity;
     }
+
+    public void addQuantity(long amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("add amount must be positive");
+        }
+        quantity = Math.addExact(quantity, amount);
+    }
 }
