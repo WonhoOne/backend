@@ -17,6 +17,9 @@ provided through `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD`, plus `JWT_SECRET`
 (at least 32 UTF-8 bytes). Authentication and optional Employee provisioning are
 documented in [docs/auth-security.md](docs/auth-security.md).
 Tests use the H2 test profile and require no external MySQL server.
+Product and schedule APIs, business date configuration (`BUSINESS_TIME_ZONE`,
+default Asia/Seoul), and the presentation walkthrough are documented in
+[docs/tour-catalog-schedule-api.md](docs/tour-catalog-schedule-api.md).
 
 Build and test with the Maven Wrapper:
 

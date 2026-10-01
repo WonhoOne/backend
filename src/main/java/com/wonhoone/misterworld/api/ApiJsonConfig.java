@@ -12,11 +12,14 @@ import tools.jackson.databind.type.LogicalType;
 public class ApiJsonConfig {
     @Bean
     JsonMapperBuilderCustomizer strictRequestTypes() {
-        // Contract fields are strings; silently coercing a number would hide a malformed request.
+        // Coercion must not turn malformed field types or fractional KRW into valid input.
         return builder -> builder.enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                 .withCoercionConfig(LogicalType.Textual, config -> config
                         .setCoercion(CoercionInputShape.Integer, CoercionAction.Fail)
                         .setCoercion(CoercionInputShape.Float, CoercionAction.Fail)
-                        .setCoercion(CoercionInputShape.Boolean, CoercionAction.Fail));
+                        .setCoercion(CoercionInputShape.Boolean, CoercionAction.Fail))
+                .withCoercionConfig(LogicalType.Integer, config -> config
+                        .setCoercion(CoercionInputShape.Float, CoercionAction.Fail)
+                        .setCoercion(CoercionInputShape.String, CoercionAction.Fail));
     }
 }

@@ -44,6 +44,12 @@ public class TourProductJpaEntity {
         return id;
     }
 
+    public void updateDetails(Theme theme, String name, String description) {
+        this.theme = Objects.requireNonNull(theme, "theme must not be null");
+        this.name = Objects.requireNonNull(name, "name must not be null");
+        this.description = Objects.requireNonNull(description, "description must not be null");
+    }
+
     public Theme getTheme() {
         return theme;
     }

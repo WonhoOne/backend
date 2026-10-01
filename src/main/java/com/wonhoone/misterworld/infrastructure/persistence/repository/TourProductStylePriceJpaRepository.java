@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface TourProductStylePriceJpaRepository extends JpaRepository<TourProductStylePriceJpaEntity, Long> {
     List<TourProductStylePriceJpaEntity> findByTourProductId(Long tourProductId);
+    List<TourProductStylePriceJpaEntity> findByTourProductIdIn(List<Long> tourProductIds);
+    void deleteByTourProductId(Long tourProductId);
 }

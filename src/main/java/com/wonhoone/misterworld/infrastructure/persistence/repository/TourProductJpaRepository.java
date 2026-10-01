@@ -4,4 +4,5 @@ import com.wonhoone.misterworld.infrastructure.persistence.entity.TourProductJpa
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TourProductJpaRepository extends JpaRepository<TourProductJpaEntity, Long> {
+    java.util.List<TourProductJpaEntity> findAllByOrderByIdAsc();
 }

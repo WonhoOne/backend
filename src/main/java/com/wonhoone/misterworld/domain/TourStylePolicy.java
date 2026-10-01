@@ -1,9 +1,18 @@
 package com.wonhoone.misterworld.domain;
 
 import java.util.Objects;
+import java.util.List;
 
 public final class TourStylePolicy {
     private TourStylePolicy() {
+    }
+
+    public static List<TourStyle> allowedStyles(Theme theme) {
+        Objects.requireNonNull(theme, "theme must not be null");
+        return switch (theme) {
+            case HONEYMOON_ROMANCE, PARENTS_HEALING -> List.of(TourStyle.GRAND, TourStyle.PREMIUM);
+            case GOLF_CHALLENGE, OUTDOOR_TREKKING -> List.of(TourStyle.CLASSIC, TourStyle.GRAND, TourStyle.PREMIUM);
+        };
     }
 
     public static boolean isAllowed(Theme theme, TourStyle style) {

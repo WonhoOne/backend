@@ -31,7 +31,9 @@ approved shared v0.2 contracts. Implementation status:
 
 - B2 implemented: Auth/JWT, password encoding, authorization, Employee provisioning,
   D-10 common auth errors. See [auth-security.md](auth-security.md).
-- B3: product/schedule public and Employee API, DTO/error projection.
+- B3 implemented: public product/schedule reads, Employee product writes,
+  DTO/error projection, business date and reservability. See
+  [tour-catalog-schedule-api.md](tour-catalog-schedule-api.md).
 - B4/B5: final Reservation rules, configuration/price snapshots, concurrency,
   History/Loyalty, confirmation and SMS after commit.
 - Later use cases: atomic Inventory addition and provider integration.
@@ -41,7 +43,8 @@ see [domain-foundation.md](domain-foundation.md) for its limits.
 
 Local startup now also requires JWT_SECRET (at least 32 UTF-8 bytes).
 JWT_EXPIRES_IN_SECONDS defaults to 3600; Employee bootstrap is opt-in.
-Backend-local choices still to make include business clock, SMS provider/retry mechanics,
+Business date defaults to Asia/Seoul (BUSINESS_TIME_ZONE override).
+Backend-local choices still to make include SMS provider/retry mechanics,
 transaction/locking strategy, and deployment. These are implementation decisions,
 not unresolved shared contracts.
 
