@@ -156,14 +156,15 @@ or extra endpoint exists.
 ## Verification and scope
 
 AuthIntegrationTests uses MockMvc with the real Spring Security filter chain,
-H2/Flyway and BCrypt. Test-only controllers expose identities for authorization
-assertions; they are never packaged into production. Tests cover signup/login,
+H2/Flyway and BCrypt. Test-only Employee controllers expose identities for authorization
+assertions; they are never packaged into production. B6 removes the Customer History
+probe; token, role and statelessness tests use the production History endpoint.
+Tests cover signup/login,
 case normalization, null/blank/length/type errors, secret redaction, real tokens,
 signature/expiry distinction, wrong roles, deny-by-default, and statelessness.
 Employee tests cover disabled/enabled bootstrap, idempotence, startup properties,
 missing config, preserving existing accounts and legacy canonical collisions.
 JWT configuration tests cover missing/short secrets and configured seconds.
 
-TourProduct, TourSchedule, Reservation, Travel History, Inventory and SMS APIs
-remain for later gates. Existing domain/persistence foundations remain unchanged.
-Next gate is B3, after Control Tower review.
+TourProduct/TourSchedule (B3), Reservation (B5) and Travel History (B6) APIs are now
+implemented. Next gates are B7 Inventory, B8 SMS and B9 integration/hardening.

@@ -190,10 +190,10 @@ class AuthIntegrationTests {
         String token = token("customer");
         long id = accounts.findByLoginId("customer").orElseThrow().getId();
         http.perform(get("/api/v1/customers/me/travel-history").header("Authorization", "Bearer " + token))
-                .andExpect(status().isOk()).andExpect(jsonPath("$.id").value(id))
-                .andExpect(jsonPath("$.role").value("CUSTOMER"));
+                .andExpect(status().isOk()).andExpect(content().json("[]"));
         var claims = SignedJWT.parse(token).getJWTClaimsSet();
         assertThat(claims.getSubject()).isEqualTo(Long.toString(id));
+        assertThat(claims.getClaim("role")).isEqualTo("CUSTOMER");
         assertThat(claims.getClaim("loginId")).isNull();
         assertThat(claims.getExpirationTime().toInstant().getEpochSecond()
                 - claims.getIssueTime().toInstant().getEpochSecond()).isEqualTo(3600);
@@ -349,11 +349,11 @@ class AuthIntegrationTests {
         @Bean SecurityProbe securityProbe() { return new SecurityProbe(); }
     }
 
-    // Only unimplemented use cases retain probes; catalog/schedule tests use production controllers.
+    // Employee-only probes exercise identity and safe errors; History uses its production controller.
     @RestController
     @TestComponent
     static class SecurityProbe {
-        @GetMapping({"/api/v1/employee/security-probe", "/api/v1/customers/me/travel-history"})
+        @GetMapping("/api/v1/employee/security-probe")
         AuthenticatedUser identity(@AuthenticationPrincipal Jwt principal) { return AuthenticatedUser.from(principal); }
 
         @GetMapping("/api/v1/employee/security-failure")

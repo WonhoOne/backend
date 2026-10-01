@@ -137,8 +137,9 @@ ReservationStatus, coupleCount field or Customer contact snapshot.
 Tests are separated into REST/snapshot/ownership, validation/rollback, recruitment,
 concurrency and Spring-free recruitment policy groups. They use the real security
 filter, H2 MySQL mode, unchanged V1/V2/V3 Flyway scripts and Hibernate validation.
-The former B2 Customer identity probe moves to the still-deferred History path;
-Reservation paths are tested against the production controller.
+Reservation and B6 History paths are tested against production controllers.
+B6 removes the former Customer identity probe mapping; Employee probes remain.
+See [travel-history.md](travel-history.md) for the snapshot-only collection read.
 
 The 229-test B4 baseline is preserved. B5 adds 76 tests (28 API, 21 validation,
 17 recruitment, 4 concurrency and 6 pure policy), for 305 total with zero failures,
@@ -162,5 +163,5 @@ show the same-Schedule lock test: one row lock, serialized creates, one first tr
 Actual MySQL 8 PESSIMISTIC_WRITE, waiting/isolation behavior, CHECK and FK/index
 semantics remain unverified. H2 success is not proof of those engine properties;
 no Docker/Testcontainers is added here. V1/V2/V3 are unchanged and there is no V4.
-History REST (B6), Inventory REST, SMS delivery (B8), schedule CRUD/capacity/manual
+B6 implements History REST over snapshots. Inventory REST (B7), SMS delivery (B8), schedule CRUD/capacity/manual
 close, Reservation update/cancel, payment/refund and idempotency remain deferred.

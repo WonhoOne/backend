@@ -8,7 +8,8 @@ storage. Shared meanings follow WonhoOne/docs main v0.2, snapshot
 The shared ERD is logical; it is not a one-to-one physical schema prescription.
 B4 adds Reservation configuration/price and historical Product/date snapshots in
 V3; see [reservation-domain-persistence.md](reservation-domain-persistence.md).
-History is a later projection over these records, not a separate table.
+B6 History is a scalar projection over these records, with no new table or migration;
+see [travel-history.md](travel-history.md).
 B5 connects Reservation REST and persisted Schedule aggregates using a target-row
 pessimistic lock and READ_COMMITTED create transaction. No migration is added;
 see [reservation-api-concurrency.md](reservation-api-concurrency.md).

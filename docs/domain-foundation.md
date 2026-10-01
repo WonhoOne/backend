@@ -41,7 +41,8 @@ Theme/Style eligibility. These models have no database identity.
   than an independent input/entity. B5 connects persisted aggregates through the
   shared pure TourScheduleRecruitmentPolicy.
 - Price, Loyalty eligibility and historical snapshot persistence are implemented
-  by B4; B5 implements Reservation REST and final transaction coordination. History REST remains B6.
+  by B4; B5 implements Reservation REST and final transaction coordination. B6 implements
+  History REST through snapshot scalar projection; see [travel-history.md](travel-history.md).
 - B3 implements BR-30 from approved docs/main `c38995d1c33eabc73c2378335a1536b0d9ae4b1e`:
   startDate must be after Backend business date; confirmation does not close intake.
   See [tour-catalog-schedule-api.md](tour-catalog-schedule-api.md). B5 reuses this policy.

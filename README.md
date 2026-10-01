@@ -24,6 +24,8 @@ B4 domain rules, snapshots, Loyalty and the B5/B6 integration boundaries are in
 [docs/reservation-domain-persistence.md](docs/reservation-domain-persistence.md).
 Reservation REST, ownership, Schedule locking and recruitment/confirmation are in
 [docs/reservation-api-concurrency.md](docs/reservation-api-concurrency.md).
+Customer Travel History snapshot projection and its presentation walkthrough are in
+[docs/travel-history.md](docs/travel-history.md).
 
 Build and test with the Maven Wrapper:
 
