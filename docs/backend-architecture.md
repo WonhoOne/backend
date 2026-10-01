@@ -16,6 +16,8 @@ Under `com.wonhoone.misterworld`:
 | application | Use-case coordination; existing in-memory reservation example |
 | application.port | External capability boundary: SmsSender |
 | application.auth | Signup/login, credential normalization and Employee bootstrap |
+| application.tour | Product query/command coordination, write validation and DTO projections |
+| application.time / config | Shared business-date provider and configurable business Clock |
 | api.controller / api.dto | HTTP mappings, validated requests and safe response projections |
 | api.error | D-10 error bodies, validation and exception mapping |
 | security | Visible endpoint boundaries, JWT issue/validation and principal mapping |
@@ -23,6 +25,9 @@ Under `com.wonhoone.misterworld`:
 | infrastructure.persistence.repository | Direct Spring Data access to persisted records |
 
 B2 adds API/security packages with concrete authentication implementations.
+B3 implements product/schedule flows with separate query/command services,
+pure reservability policy and recruitment projection. See
+[tour-catalog-schedule-api.md](tour-catalog-schedule-api.md) for the walkthrough.
 infrastructure.sms remains deferred.
 
 ## Domain object and JPA entity
@@ -40,7 +45,7 @@ mapping is implied.
 ## Expected request flow
 
 Auth flow is implemented as described in [auth-security.md](auth-security.md).
-Future business flow: Controller → Application Service → Domain Rule →
+Implemented catalog/schedule flow: Controller → Application Service → Domain Rule →
 Persistence Repository → DB. Application services will own transaction boundaries
 and explicitly construct/provide the data needed by domain rules. Controllers
 will handle DTO and HTTP concerns. Exact new class names are intentionally left

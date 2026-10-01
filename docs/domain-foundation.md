@@ -40,8 +40,9 @@ Theme/Style eligibility. These models have no database identity.
   than an independent input/entity. API projection is deferred to B3/B5.
 - Price, Loyalty and historical snapshots are approved contracts, with
   implementation deferred to Reservation/History work.
-- `reservable` has no column or policy in B1; B3/B5 must check the remaining
-  policy decision with Control Tower before implementation.
+- B3 implements BR-30 from approved docs/main `c38995d1c33eabc73c2378335a1536b0d9ae4b1e`:
+  startDate must be after Backend business date; confirmation does not close intake.
+  See [tour-catalog-schedule-api.md](tour-catalog-schedule-api.md). B5 reuses this policy.
 
 ## Notification boundary
 

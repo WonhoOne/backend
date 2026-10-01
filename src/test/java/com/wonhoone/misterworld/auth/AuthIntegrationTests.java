@@ -263,8 +263,11 @@ class AuthIntegrationTests {
     }
 
     @Test void publicReadPathsDoNotRequireAuthentication() throws Exception {
-        for (String path : new String[]{"/api/v1/tours", "/api/v1/tours/1", "/api/v1/tour-schedules", "/api/v1/tour-schedules/1"}) {
+        for (String path : new String[]{"/api/v1/tours", "/api/v1/tour-schedules"}) {
             http.perform(get(path)).andExpect(status().isOk());
+        }
+        for (String path : new String[]{"/api/v1/tours/9223372036854775807", "/api/v1/tour-schedules/9223372036854775807"}) {
+            http.perform(get(path)).andExpect(status().isNotFound());
         }
     }
 
@@ -346,18 +349,12 @@ class AuthIntegrationTests {
         @Bean SecurityProbe securityProbe() { return new SecurityProbe(); }
     }
 
-    // Test fixtures exercise real access rules without adding production business controllers.
+    // Only unimplemented use cases retain probes; catalog/schedule tests use production controllers.
     @RestController
     @TestComponent
     static class SecurityProbe {
         @GetMapping({"/api/v1/employee/security-probe", "/api/v1/reservations/{id}"})
         AuthenticatedUser identity(@AuthenticationPrincipal Jwt principal) { return AuthenticatedUser.from(principal); }
-
-        @GetMapping({"/api/v1/tours", "/api/v1/tours/{id}", "/api/v1/tour-schedules/{id}"})
-        Map<String, String> publicRead() { return Map.of("fixture", "public"); }
-
-        @GetMapping("/api/v1/tour-schedules")
-        Map<String, String> schedules(@RequestParam(required = false) Long tourId) { return publicRead(); }
 
         @GetMapping("/api/v1/employee/security-failure")
         void fail() { throw new IllegalStateException("internal-secret"); }
