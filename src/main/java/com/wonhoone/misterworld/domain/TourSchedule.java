@@ -52,11 +52,7 @@ public final class TourSchedule {
     }
 
     private void validateReservationForSchedule(Reservation reservation) {
-        if (isHoneymoonSchedule()
-                && (reservation.participantCount() < 2 || reservation.participantCount() % 2 != 0)) {
-            throw new IllegalArgumentException(
-                    "Honeymoon reservations must include an even number of at least 2 participants");
-        }
+        ReservationPartyPolicy.validate(tourProduct.theme(), reservation.participantCount());
     }
 
     private boolean confirmationThresholdReached(long participantCount, long honeymoonCoupleCount) {

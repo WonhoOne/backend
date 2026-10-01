@@ -12,16 +12,19 @@ import org.springframework.transaction.annotation.Transactional;
 public class TourProductCommandService {
     private final TourProductJpaRepository products;
     private final TourProductStylePriceJpaRepository prices;
+    private final TourScheduleJpaRepository schedules;
     private final TourProductWriteValidator validator;
     private final TourProductResponseFactory responses;
 
     public TourProductCommandService(TourProductJpaRepository products,
                                      TourProductStylePriceJpaRepository prices,
-                                     TourProductWriteValidator validator, TourProductResponseFactory responses) {
+                                     TourProductWriteValidator validator, TourProductResponseFactory responses,
+                                     TourScheduleJpaRepository schedules) {
         this.products = products;
         this.prices = prices;
         this.validator = validator;
         this.responses = responses;
+        this.schedules = schedules;
     }
 
     public TourProductResponse create(TourProductWriteRequest request) {
@@ -35,6 +38,10 @@ public class TourProductCommandService {
         var product = products.findById(tourId).orElseThrow(() ->
                 new ResourceNotFoundException("TOUR_PRODUCT_NOT_FOUND", "Tour product was not found."));
         validator.validate(request);
+        if (request.theme() != product.getTheme() && schedules.existsByTourProductId(tourId)) {
+            throw new ResourceConflictException("TOUR_PRODUCT_THEME_LOCKED",
+                    "Tour product theme cannot change after a schedule exists.");
+        }
         product.updateDetails(request.theme(), request.name(), request.description());
         prices.deleteByTourProductId(tourId);
         // Flush deletes before inserts reuse the unique (product, style) key.

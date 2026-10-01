@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TourScheduleJpaRepository extends JpaRepository<TourScheduleJpaEntity, Long> {
+    boolean existsByTourProductId(Long tourProductId);
+
     @EntityGraph(attributePaths = "tourProduct")
     List<TourScheduleJpaEntity> findAllByOrderByStartDateAscIdAsc();
 

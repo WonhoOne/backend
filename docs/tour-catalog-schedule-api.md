@@ -49,6 +49,12 @@ failure on a later price insert to verify both POST and PUT rollback.
 
 ## Schedule reads and business date
 
+B4 enforces approved BR-31 before Product PUT mutation: a different Theme with any
+linked Schedule returns 409 TOUR_PRODUCT_THEME_LOCKED. Same-Theme replacement of
+name/description/prices remains allowed. See
+[reservation-domain-persistence.md](reservation-domain-persistence.md) for the
+approved `cad8daed210cfb60078f24cabe14c2f383f3ef65` reference and endpoint scenarios.
+
 TourScheduleController delegates to TourScheduleQueryService's read-only
 transaction. Schedule repository methods explicitly order startDate then ID and
 fetch the product using EntityGraph so Theme is available with open-in-view=false.
@@ -80,8 +86,8 @@ recruitment unit, and persisted confirmed. Honeymoon uses COUPLE_TEAM and requir
 count 2; the other themes use PARTICIPANT and required count 3. The projection
 preserves persisted confirmation rather than recomputing it from the count.
 
-B3 has no persisted Reservation feature, so reachable persisted recruitment has
-currentCount=0. TourScheduleQueryService supplies this count at one projection
+B4 now has persisted Reservation foundations, but public recruitment still has
+currentCount=0 until B5. TourScheduleQueryService supplies this count at one projection
 boundary; zero is not a permanent business rule. B5 should query real Reservation
 aggregates (couple/team counts for Honeymoon, participants otherwise) and feed
 the same projection, using a batch aggregate for collections. A confirmed test
@@ -114,9 +120,11 @@ excluded from this handler's log.
 
 ## Scope and verification limits
 
-V1/V2 remain immutable; there is no new migration or demo product/schedule seed.
-Reservation persistence/API, snapshots/Loyalty, History, Inventory API/mutation,
-SMS, schedule CRUD/capacity/close/cancel, and pagination remain later work.
+V1/V2 remain immutable. B3 added no migration; B4 adds V3 for Reservation snapshots.
+There is no demo product/schedule seed.
+At the original B3 gate Reservation persistence and snapshots/Loyalty were deferred.
+B4 implements those foundations and BR-31. Reservation API, History REST, Inventory
+API/mutation, SMS, schedule CRUD/capacity/close/cancel and pagination remain outside B4.
 H2 MySQL-mode tests execute Flyway and schema validation and exercise the real
 SecurityFilterChain. Real MySQL collation and concurrent signup mapping remain
 integration/hardening work; H2 does not prove those engine properties.

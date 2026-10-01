@@ -20,6 +20,8 @@ Tests use the H2 test profile and require no external MySQL server.
 Product and schedule APIs, business date configuration (`BUSINESS_TIME_ZONE`,
 default Asia/Seoul), and the presentation walkthrough are documented in
 [docs/tour-catalog-schedule-api.md](docs/tour-catalog-schedule-api.md).
+B4 domain rules, snapshots, Loyalty and the B5/B6 integration boundaries are in
+[docs/reservation-domain-persistence.md](docs/reservation-domain-persistence.md).
 
 Build and test with the Maven Wrapper:
 

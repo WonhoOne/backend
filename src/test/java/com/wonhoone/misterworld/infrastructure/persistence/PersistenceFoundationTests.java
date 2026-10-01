@@ -57,8 +57,8 @@ class PersistenceFoundationTests {
 
     @Test
     void flywayAppliesCoreSchemaAndInventoryCatalogBeforeJpaStarts() {
-        assertEquals(2, flyway.info().applied().length);
-        assertEquals("2", flyway.info().current().getVersion().getVersion());
+        assertEquals(3, flyway.info().applied().length);
+        assertEquals("3", flyway.info().current().getVersion().getVersion());
         assertEquals(0, flyway.info().pending().length);
         assertTrue(flyway.validateWithResult().validationSuccessful);
         assertEquals(0, userAccounts.count());
