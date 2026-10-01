@@ -142,6 +142,15 @@ The image tag is mysql:8.4 and may resolve to a newer patch later; every run rec
 its own version. CI run IDs/conclusions belong in the PR checks and Backend #8
 handoff, separately from this local run record.
 
+The first [PR #17 CI run](https://github.com/WonhoOne/backend/actions/runs/36883169099)
+verified head `9781b2f2caf03e46a311ba0d5aef1bfd6aab876c`: both H2 and MySQL jobs
+passed, CI MySQL was also 8.4.11, and all 430 default / 19 MySQL tests had zero
+failures/errors/skips. Its History EXPLAIN matched the local result below.
+The new report-upload action was then moved from v4 to current v7 after that
+run reported the older action's Node 20 deprecation. Current submitted-head checks
+are available on [PR #17](https://github.com/WonhoOne/backend/pull/17); the final
+CI record is included in the cumulative Backend #8 handoff.
+
 | Verification | Observed local result |
 | --- | --- |
 | Default regression | 430 tests, failures 0, errors 0, skipped 0 |
