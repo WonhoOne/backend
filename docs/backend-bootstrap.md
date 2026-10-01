@@ -1,57 +1,49 @@
 # Backend Bootstrap
 
-## Status
+## Status and scope
 
-Backend Internal Approved Decision
+Backend Internal Approved Decision. Shared contracts are defined by
+[WonhoOne/docs main v0.2](https://github.com/WonhoOne/docs/blob/79955fc9c864ad0efce6dee9db2319e684573e7a/baseline/BASELINE-v0.2.md).
+This document records implementation status, not a duplicate API contract.
 
-## Scope
-
-This document records Bootstrap technology decisions used inside the Backend implementation. It does not define shared API, Business Rule, or Shared Domain contracts.
-
-## Approved Decisions
+## Technology decisions
 
 | Item | Value |
 | --- | --- |
 | Java | 21 |
-| Build Tool | Maven |
+| Build tool | Maven Wrapper |
 | Spring Boot | 4.1.1 |
-| Base Package | `com.wonhoone.misterworld` |
+| Base package | `com.wonhoone.misterworld` |
+| Persistence | Spring Data JPA / MySQL / Flyway |
+| Tests | Pure Java unit tests; H2 MySQL-mode persistence tests |
+| CI | GitHub Actions on main pushes and main PRs |
 
-## Initial Capability Boundary
+## Implementation status
 
-The initial project prepares only these capabilities:
+B0/B1 provides local architecture documentation and persistence for UserAccount,
+TourProduct, style prices, TourSchedule, and the fixed Inventory catalog.
+Flyway owns schema creation; Hibernate validates the migrated schema.
 
-- Web / REST
-- Bean Validation
-- JPA persistence
-- MySQL connectivity
-- Backend testing
+Authentication (JWT Bearer), DTOs, common errors, collection ordering without
+pagination, price/Loyalty, Inventory semantics, and SMS failure behavior are
+approved shared v0.2 contracts. Their implementation is still pending:
 
-## Explicitly Deferred
+- B2: Auth/JWT, password encoding, authorization, Employee provisioning.
+- B3: product/schedule public and Employee API, DTO/error projection.
+- B4/B5: final Reservation rules, configuration/price snapshots, concurrency,
+  History/Loyalty, confirmation and SMS after commit.
+- Later use cases: atomic Inventory addition and provider integration.
 
-The following decisions remain open:
+The existing pure Domain Foundation remains an incomplete in-memory model;
+see [domain-foundation.md](domain-foundation.md) for its limits.
 
-- Authentication method
-- JWT versus session
-- Spring Security
-- Customer / Employee persistence structure
-- User + Role structure
-- Request DTO and Response DTO
-- Error response format
-- Pagination
-- Authentication token format
-- Reservation status
-- Cancellation
-- Separate TravelHistory table
-- Price calculation
-- Detailed Loyalty rules
-- SMS provider
-- Inventory deduction timing
-- Detailed Hotel / Transport / Meal models
-- Detailed package architecture
-- Deployment
-- CI/CD
+Backend-local choices still to make include JWT library/claims/lifetime,
+provisioning mechanism, business clock, SMS provider/retry mechanics,
+transaction/locking strategy, and deployment. These are implementation decisions,
+not unresolved shared contracts.
 
-## Documentation Boundary
+## Documentation boundary
 
-Shared contracts belong in `WonhoOne/docs`. Backend-internal implementation documentation belongs in `WonhoOne/backend/docs`. If a Backend-internal decision begins to affect another repository's contract, propose a change to the shared docs first and wait for approval before implementation. Do not duplicate shared contracts locally or resolve shared TBD items in Backend-local documentation.
+Shared changes must be approved in WonhoOne/docs first. Physical schema and
+package choices live here; see [backend-architecture.md](backend-architecture.md)
+and [persistence-foundation.md](persistence-foundation.md).
