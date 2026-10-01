@@ -12,6 +12,18 @@ import org.springframework.data.repository.query.Param;
 
 public interface ReservationJpaRepository extends JpaRepository<ReservationJpaEntity, Long> {
     @Query("""
+            select distinct r.customer.id as customerId, r.customer.contact as contact
+            from ReservationJpaEntity r where r.tourSchedule.id = :scheduleId
+            order by r.customer.id asc
+            """)
+    List<ConfirmationRecipientRow> findConfirmationRecipients(@Param("scheduleId") long scheduleId);
+
+    interface ConfirmationRecipientRow {
+        long getCustomerId();
+        String getContact();
+    }
+
+    @Query("""
             select reservation from ReservationJpaEntity reservation
             where reservation.id = :reservationId and reservation.customer.id = :customerId
             """)

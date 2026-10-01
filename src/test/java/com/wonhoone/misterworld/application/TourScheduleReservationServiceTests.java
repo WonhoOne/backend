@@ -1,6 +1,8 @@
 package com.wonhoone.misterworld.application;
 
 import com.wonhoone.misterworld.application.port.SmsSender;
+import com.wonhoone.misterworld.application.port.SmsMessage;
+import com.wonhoone.misterworld.application.port.SmsSendResult;
 import com.wonhoone.misterworld.domain.Customer;
 import com.wonhoone.misterworld.domain.Reservation;
 import com.wonhoone.misterworld.domain.Theme;
@@ -125,8 +127,9 @@ class TourScheduleReservationServiceTests {
         private final List<String> contacts = new ArrayList<>();
 
         @Override
-        public void sendTourScheduleConfirmed(String contact) {
-            contacts.add(contact);
+        public SmsSendResult send(SmsMessage message) {
+            contacts.add(message.to());
+            return new SmsSendResult(null);
         }
     }
 }

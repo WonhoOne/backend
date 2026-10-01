@@ -164,9 +164,9 @@ class ReservationPersistenceTests {
         assertThrows(IllegalArgumentException.class, () -> ReservationJpaEntity.capture(customer, schedule, 4,
                 smallCar, ReservationPriceCalculator.calculate(100, 4, false)));
     }
-    @Test void migrationV3AppliesAndHibernateValidationSucceeds() {
-        assertEquals(3, flyway.info().applied().length);
-        assertEquals("3", flyway.info().current().getVersion().getVersion());
+    @Test void migrationV4AppliesAndHibernateValidationSucceeds() {
+        assertEquals(4, flyway.info().applied().length);
+        assertEquals("4", flyway.info().current().getVersion().getVersion());
         assertTrue(flyway.validateWithResult().validationSuccessful);
         assertEquals(0, flyway.info().pending().length);
         assertNotNull(entityManager.getMetamodel().entity(ReservationJpaEntity.class));

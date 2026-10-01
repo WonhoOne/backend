@@ -7,6 +7,10 @@ spring:
     hibernate:
       ddl-auto: validate
     open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
   flyway:
     enabled: true
 
@@ -25,3 +29,20 @@ employee:
     name: ${EMPLOYEE_NAME:}
     address: ${EMPLOYEE_ADDRESS:}
     contact: ${EMPLOYEE_CONTACT:}
+
+sms:
+  delivery:
+    enabled: ${SMS_DELIVERY_ENABLED:false}
+    poll-delay-ms: ${SMS_DELIVERY_POLL_DELAY_MS:10000}
+    batch-size: ${SMS_DELIVERY_BATCH_SIZE:50}
+  retry:
+    initial-seconds: ${SMS_RETRY_INITIAL_SECONDS:30}
+    max-seconds: ${SMS_RETRY_MAX_SECONDS:1800}
+  provider: ${SMS_PROVIDER:solapi}
+  solapi:
+    api-key: ${SOLAPI_API_KEY:}
+    api-secret: ${SOLAPI_API_SECRET:}
+    sender-number: ${SOLAPI_SENDER_NUMBER:}
+    base-url: ${SOLAPI_BASE_URL:https://api.solapi.com}
+    connect-timeout-seconds: ${SOLAPI_CONNECT_TIMEOUT_SECONDS:5}
+    request-timeout-seconds: ${SOLAPI_REQUEST_TIMEOUT_SECONDS:10}

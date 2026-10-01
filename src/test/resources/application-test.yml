@@ -18,3 +18,8 @@ security:
 employee:
   bootstrap:
     enabled: false
+
+# Tests never enable paid delivery through inherited environment variables.
+sms:
+  delivery:
+    enabled: false

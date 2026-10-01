@@ -36,6 +36,8 @@ abstract class ReservationIntegrationSupport {
     @Autowired TourProductStylePriceJpaRepository prices;
     @Autowired TourScheduleJpaRepository schedules;
     @Autowired ReservationJpaRepository reservations;
+    @Autowired SmsConfirmationRecipientJpaRepository smsRecipients;
+    @Autowired SmsConfirmationEventJpaRepository smsEvents;
     @Autowired ReservationCommandService commands;
     @Autowired ReservationQueryService queries;
     @Autowired PlatformTransactionManager transactions;
@@ -48,6 +50,8 @@ abstract class ReservationIntegrationSupport {
     String bearer;
 
     @BeforeEach void prepareReservationFixtures() {
+        smsRecipients.deleteAll();
+        smsEvents.deleteAll();
         reservations.deleteAll();
         schedules.deleteAll();
         prices.deleteAll();
