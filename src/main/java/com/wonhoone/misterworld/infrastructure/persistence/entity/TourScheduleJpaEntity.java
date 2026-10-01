@@ -65,4 +65,11 @@ public class TourScheduleJpaEntity {
     public boolean isConfirmed() {
         return confirmed;
     }
+
+    /** The caller checks the recruitment threshold while holding this Schedule's write lock. */
+    public boolean markConfirmed() {
+        if (confirmed) return false;
+        confirmed = true;
+        return true;
+    }
 }

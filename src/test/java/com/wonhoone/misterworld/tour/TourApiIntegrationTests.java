@@ -372,7 +372,7 @@ class TourApiIntegrationTests {
         }
     }
 
-    @Test void b3RecruitmentCountIsZeroWithoutPersistedReservationFeature() throws Exception {
+    @Test void recruitmentCountIsZeroWhenScheduleHasNoReservations() throws Exception {
         var tour = product(Theme.HONEYMOON_ROMANCE, "Trip");
         schedule(tour, "2026-10-02", false);
         http.perform(get("/api/v1/tour-schedules")).andExpect(jsonPath("$[0].recruitment.currentCount").value(0));
