@@ -163,5 +163,7 @@ show the same-Schedule lock test: one row lock, serialized creates, one first tr
 Actual MySQL 8 PESSIMISTIC_WRITE, waiting/isolation behavior, CHECK and FK/index
 semantics remain unverified. H2 success is not proof of those engine properties;
 no Docker/Testcontainers is added here. V1/V2/V3 are unchanged and there is no V4.
-B6 implements History REST over snapshots. Inventory REST (B7), SMS delivery (B8), schedule CRUD/capacity/manual
+B6 implements History REST over snapshots. B7 implements Inventory REST separately
+without Reservation stock coupling; see [inventory-api.md](inventory-api.md).
+SMS delivery (B8), schedule CRUD/capacity/manual
 close, Reservation update/cancel, payment/refund and idempotency remain deferred.

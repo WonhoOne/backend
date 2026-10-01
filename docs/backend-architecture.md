@@ -18,6 +18,7 @@ Under `com.wonhoone.misterworld`:
 | application.auth | Signup/login, credential normalization and Employee bootstrap |
 | application.tour | Product query/command coordination, write validation and DTO projections |
 | application.reservation | Reservation create/detail, semantic validation, snapshots, Loyalty and Travel History projection |
+| application.inventory | Inventory query/add use cases and atomic aggregate mutation |
 | application.time / config | Shared business-date provider and configurable business Clock |
 | api.controller / api.dto | HTTP mappings, validated requests and safe response projections |
 | api.error | D-10 error bodies, validation and exception mapping |
@@ -41,7 +42,11 @@ See [reservation-api-concurrency.md](reservation-api-concurrency.md).
 B6 adds CustomerHistoryController → authenticated identity → TravelHistoryQueryService
 → business date → Reservation scalar projection → TravelHistoryResponse. Historical
 values come from snapshots; current Schedule confirmation governs eligibility.
-See [travel-history.md](travel-history.md). B7 Inventory, B8 SMS and B9 hardening remain.
+See [travel-history.md](travel-history.md).
+B7 connects EmployeeInventoryController to InventoryQueryService / InventoryCommandService,
+the existing Inventory repository and checked Entity mutation. The Command transaction
+locks only the target catalog row and flushes before returning the DTO. See
+[inventory-api.md](inventory-api.md). B8 SMS and B9 hardening remain.
 
 ## Domain object and JPA entity
 

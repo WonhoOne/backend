@@ -56,7 +56,8 @@ of a product's price set remain Domain/Application responsibilities.
 Relationships are unidirectional lazy ManyToOne from price/schedule to product,
 without cascade delete or inverse collections. Each repository is a direct
 Spring Data JpaRepository. Constructors accept required storage values with basic
-null/range checks; no public setters or speculative Inventory behavior are added.
+null/range checks; no public setters are added. B7 adds the intent-specific
+InventoryJpaEntity.addQuantity method with positive-amount and overflow checks.
 UserAccount receives an already encoded passwordHash; B1 does not encode passwords.
 
 No reservable or recruitment-count columns are stored. B4 adds Reservation tables
@@ -66,9 +67,14 @@ users/products/schedules are introduced.
 ## Inventory initialization
 
 V2 creates exactly one zero-stock row per canonical item type. This is the fixed
-catalog, not demo data. Future Employee add operations must update that row
-atomically rather than insert another aggregate. Locking/overflow policy belongs
-to the later use case.
+catalog, not demo data. B7 Employee adds update the existing row under
+PESSIMISTIC_WRITE inside InventoryCommandService's write transaction. Managed
+Entity dirty checking plus explicit flush updates the aggregate without save/insert.
+Math.addExact rejects overflow before assignment; failure rolls back with safe
+INTERNAL_ERROR. A missing catalog row fails internally without a replacement.
+GET orders rows by id ASC in the repository and includes zero stock.
+V1/V2/V3 remain unchanged; Flyway stays at version 3. See
+[inventory-api.md](inventory-api.md). B8 SMS and B9 MySQL hardening remain.
 
 ## Configuration and tests
 

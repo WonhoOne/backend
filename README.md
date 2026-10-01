@@ -26,6 +26,9 @@ Reservation REST, ownership, Schedule locking and recruitment/confirmation are i
 [docs/reservation-api-concurrency.md](docs/reservation-api-concurrency.md).
 Customer Travel History snapshot projection and its presentation walkthrough are in
 [docs/travel-history.md](docs/travel-history.md).
+Employee Inventory reads and atomic additions, row locking and the presentation
+walkthrough are in [docs/inventory-api.md](docs/inventory-api.md).
+Next gates are B8 SMS and B9 integration/hardening.
 
 Build and test with the Maven Wrapper:
 
