@@ -68,6 +68,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
+					<excludes><exclude>**/*MySqlIT.java</exclude></excludes>
 					<systemPropertyVariables>
 						<!-- Override inherited OS SMS settings; explicit Spring test properties may enable mocks. -->
 						<sms.delivery.enabled>false</sms.delivery.enabled>
@@ -80,4 +81,27 @@
 			</plugin>
 		</plugins>
 	</build>
+	<profiles>
+		<profile>
+			<id>mysql-integration</id>
+			<build><plugins><plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<configuration>
+					<includes><include>**/*MySqlIT.java</include></includes>
+					<failIfNoTests>true</failIfNoTests>
+					<forkCount>1</forkCount>
+					<reuseForks>true</reuseForks>
+					<argLine>-Duser.timezone=Pacific/Honolulu</argLine>
+					<systemPropertyVariables>
+						<sms.delivery.enabled>false</sms.delivery.enabled>
+						<employee.bootstrap.enabled>false</employee.bootstrap.enabled>
+					</systemPropertyVariables>
+				</configuration>
+				<executions><execution><goals>
+					<goal>integration-test</goal><goal>verify</goal>
+				</goals></execution></executions>
+			</plugin></plugins></build>
+		</profile>
+	</profiles>
 </project>
