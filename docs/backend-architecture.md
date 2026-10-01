@@ -1,0 +1,51 @@
+# Backend Architecture
+
+## Contract and implementation boundary
+
+Shared reference: WonhoOne/docs main Baseline v0.2 at
+`79955fc9c864ad0efce6dee9db2319e684573e7a`.
+This document describes Backend-local organization only.
+
+## Package responsibilities
+
+Under `com.wonhoone.misterworld`:
+
+| Package | Responsibility |
+| --- | --- |
+| domain | Pure Java business rules and approved value catalogs |
+| application | Use-case coordination; existing in-memory reservation example |
+| application.port | External capability boundary: SmsSender |
+| infrastructure.persistence.entity | JPA identity, columns, and database relationships |
+| infrastructure.persistence.repository | Direct Spring Data access to persisted records |
+
+API, security, config, and infrastructure.sms packages will appear when their
+actual implementations are added. No empty packages are created in B0/B1.
+
+## Domain object and JPA entity
+
+Domain object != JPA Entity. The pure models remain unchanged; new persistence
+classes carry the JpaEntity suffix and depend on domain enums, not vice versa.
+Business-rule presentation stays free of ORM lifecycle details, and mapping
+changes do not force a rewrite of the pure model.
+
+There is no speculative port/adapter layer around every Spring Data repository.
+Introduce a boundary when an actual application use case needs it. B1 repositories
+are not yet connected to the legacy reservation service; no automatic domain/entity
+mapping is implied.
+
+## Expected request flow
+
+Future flow: Controller → Application Service → Domain Rule →
+Persistence Repository → DB. Application services will own transaction boundaries
+and explicitly construct/provide the data needed by domain rules. Controllers
+will handle DTO and HTTP concerns. Exact new class names are intentionally left
+to the implementation of each use case.
+
+## Presentation / maintainability guideline
+
+Use names that expose business intent and keep methods focused on one responsibility.
+Avoid clever abstraction and implicit code generation; no Lombok is introduced.
+Use rationale comments or Javadoc where a design choice is otherwise hard to
+explain, rather than translating each line into prose. Tests describe business
+scenarios. Confirmation, price snapshots, ownership, concurrency and after-commit
+SMS must be traceable through named steps as their use cases are implemented.

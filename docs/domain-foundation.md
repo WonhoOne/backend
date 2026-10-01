@@ -1,49 +1,59 @@
 # Backend Domain Foundation
 
-## Scope
+## Scope and reference
 
-This backend-internal implementation provides the pure Java domain rules aligned with the shared v0.1.2 baseline. It does not add persistence or public API behavior.
+The existing pure Java model preserves its original business-rule foundation.
+The current approved reference is
+[WonhoOne/docs main Baseline v0.2](https://github.com/WonhoOne/docs/blob/79955fc9c864ad0efce6dee9db2319e684573e7a/baseline/BASELINE-v0.2.md),
+snapshot `79955fc9c864ad0efce6dee9db2319e684573e7a`.
+Requirements, Domain Model and Business Rules at that snapshot remain the SSOT.
 
-## Shared Contract References
+This foundation does **not** implement all v0.2 rules or public API behavior.
+B0/B1 adds independent persistence models without rewriting these pure classes.
 
-Approved contract source: `WonhoOne/docs` on `main`, latest Baseline v0.1.2.
+Related existing foundation requirements: FR-01, FR-03, FR-04, FR-06, FR-07,
+FR-08, FR-14. Related rules: BR-01, BR-02, BR-03, BR-04, BR-06, BR-07,
+BR-12, BR-13, BR-14. This is partial support, not completion of those requirements.
 
-- `baseline/BASELINE-v0.1.2.md`
-- `requirements/requirements.md`
-- `requirements/domain-model.md`
-- `requirements/business-rules.md`
+## Current responsibilities
 
-Related requirements: FR-01, FR-03, FR-04, FR-06, FR-07, FR-08, FR-14.
+- `domain`: fixed catalogs, minimal Customer/TourProduct/Reservation models,
+  Theme/Style eligibility, and in-memory schedule aggregation/confirmation.
+- `application`: adds a Reservation and calls the `SmsSender` port on the
+  first confirmation transition.
+- `application.port`: provider-independent SMS boundary.
+- New `UserRole` and `InventoryItemType` enums express approved shared values;
+  they contain no persistence annotations.
 
-Related business rules: BR-01, BR-02, BR-03, BR-04, BR-06, BR-07, BR-12, BR-13, BR-14.
+`Reservation` currently validates only participantCount >= 1.
+`TourSchedule` additionally validates Honeymoon even counts >= 2, derives
+couple/team count, and confirms at two couples/teams or three general participants.
+Its collection access returns immutable snapshots. `TourStylePolicy` validates
+Theme/Style eligibility. These models have no database identity.
 
-## Internal Structure
+## Known gaps for subsequent work
 
-- `domain`: Theme and TourStyle catalogs, minimal Customer / TourProduct / Reservation representations, schedule aggregation and confirmation policy, and Theme/TourStyle eligibility policy.
-- `application`: coordinates adding a reservation and requests confirmation notifications after the domain reports its first confirmation transition.
-- `application.port`: `SmsSender`, a provider-independent application boundary.
+- B4 must add the v0.2 maximum of 10 and final configuration/transport validation.
+- The minimal pure TourProduct stores only Theme; product identity, name,
+  description and style prices now exist in separate JPA models.
+- Public recruitment is a defined v0.2 projection; coupleCount is derived rather
+  than an independent input/entity. API projection is deferred to B3/B5.
+- Price, Loyalty and historical snapshots are approved contracts, with
+  implementation deferred to Reservation/History work.
+- `reservable` has no column or policy in B1; B3/B5 must check the remaining
+  policy decision with Control Tower before implementation.
 
-## Domain Responsibility
+## Notification boundary
 
-- `Reservation` enforces the generic `participantCount >= 1` invariant; it does not know its Theme.
-- `TourSchedule` validates Honeymoon's Theme-specific pair invariant before adding a Reservation, and owns its reservation collection, actual total participant count, recruitment threshold, and one-time first-confirmation transition.
-- A valid Honeymoon Reservation has an even `participantCount >= 2`. Its couple/team count is derived as `participantCount / 2`; a Honeymoon schedule confirms at 2 or more derived couples/teams. No Couple/Team Entity is used.
-- `totalParticipantCount` remains the count of actual participants. Whether the public API exposes `coupleCount` as a field remains TBD for API v0.2.
-- `TourStylePolicy` is the single place that validates the approved Theme/TourStyle eligibility combinations.
-- Collections exposed by `TourSchedule` are immutable snapshots. The domain is in-memory and has no persistence identity.
+The existing service is a synchronous foundation example, not the final v0.2
+SMS workflow. It neither deduplicates Customer recipients nor isolates delivery
+failures or stores retryable notifications. The shared failure policy is already
+approved: see the SSOT SMS section. Subsequent confirmation integration must add
+transaction/after-commit handling, recipient identity, retry state and a real
+provider. These behaviors are not supplied by B0/B1.
 
-## Notification Boundary
+## Why preserve the pure model
 
-`SmsSender` is an application port, not an SMS provider implementation. On the first confirmation transition, the application service requests a notification to each reservation customer's contact currently on the schedule. Provider selection and delivery failure behavior remain undecided.
-
-## Deferred
-
-- JPA, persistence, and database schema
-- REST API and DTOs
-- Authentication and security
-- Detailed TourConfiguration options
-- Inventory behavior
-- Employee model
-- Pricing and Loyalty details
-- SMS provider, retry, and failure policy
-- Reservation status and cancellation
+Business rules remain readable independently of ORM mapping. JPA entities describe
+physical data in infrastructure, while later application use cases will explicitly
+connect persistence and domain rules. See [backend-architecture.md](backend-architecture.md).
