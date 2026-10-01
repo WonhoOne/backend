@@ -139,8 +139,9 @@ now use real persisted aggregates (one grouped query for collections), and the
 internal scheduleJustConfirmed result prepares B8's after-commit notification hook.
 See [reservation-api-concurrency.md](reservation-api-concurrency.md) for the lock
 rationale, snapshot/current response semantics and concurrency tests.
-B6 can project History from Reservation id, captured Product identity/Theme/name, captured
+B6 implements History from Reservation id, captured Product identity/Theme/name, captured
 dates, configuration.style and price.total/currency, together with current confirmation.
+Its repository scalar projection avoids loading Extra options; see [travel-history.md](travel-history.md).
 No speculative aggregate, locking, ownership or History query methods are added in B4.
 
 The original pure `TourScheduleReservationService` remains a legacy in-memory foundation.
@@ -173,8 +174,9 @@ Actual MySQL 8 remains the production truth. H2 does not establish MySQL CHECK s
 enum string collation, FK/index behavior or transaction/concurrency behavior. Validate
 these during later integration/hardening; no Docker/Testcontainers dependency is added.
 Reservation REST/DTOs, concurrency/locking, actual recruitment aggregates, confirmation
-transitions, History REST, Inventory REST, SMS delivery/outbox, update/cancel/payment and
-idempotency remain outside B4. No Shared Contract blocker was found.
+transitions and History REST were outside B4 and are now implemented by B5/B6.
+B7 Inventory, B8 SMS delivery/outbox and B9 integration/hardening remain; update/cancel/
+payment and idempotency are outside this scope. No Shared Contract blocker was found.
 
 Local verification: the original main baseline passed 152 tests. B4 adds 77 scenarios
 across six groups, for 229 total with zero failures, errors or skipped tests. The

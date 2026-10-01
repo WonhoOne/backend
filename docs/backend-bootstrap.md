@@ -40,8 +40,9 @@ approved shared v0.2 contracts. Implementation status:
 - B5 implemented: CUSTOMER Reservation REST, ownership, Schedule locking,
   recruitment aggregation/confirmation and internal first-transition boundary.
   See [reservation-api-concurrency.md](reservation-api-concurrency.md).
-- B6/B8: History REST and after-commit SMS integration.
-- Later use cases: atomic Inventory addition and provider integration.
+- B6 implemented: CUSTOMER History REST over Reservation scalar snapshots.
+  See [travel-history.md](travel-history.md).
+- B7 Inventory, B8 after-commit SMS/provider integration and B9 integration/hardening remain.
 
 The existing pure Domain Foundation remains an incomplete in-memory model;
 see [domain-foundation.md](domain-foundation.md) for its limits.

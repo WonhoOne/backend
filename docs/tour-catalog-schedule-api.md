@@ -125,7 +125,8 @@ V1/V2 remain immutable. B3 added no migration; B4 adds V3 for Reservation snapsh
 There is no demo product/schedule seed.
 At the original B3 gate Reservation persistence and snapshots/Loyalty were deferred.
 B4 implements those foundations and BR-31; B5 implements Reservation API, locking,
-recruitment and confirmation. History REST, Inventory API/mutation, SMS,
+recruitment and confirmation. B6 implements [History REST](travel-history.md).
+Inventory API/mutation, SMS,
 schedule CRUD/capacity/close/cancel and pagination remain deferred.
 H2 MySQL-mode tests execute Flyway and schema validation and exercise the real
 SecurityFilterChain. Real MySQL collation and concurrent signup mapping remain
