@@ -189,7 +189,7 @@ class AuthIntegrationTests {
         signup("customer", "password");
         String token = token("customer");
         long id = accounts.findByLoginId("customer").orElseThrow().getId();
-        http.perform(get("/api/v1/reservations/1").header("Authorization", "Bearer " + token))
+        http.perform(get("/api/v1/customers/me/travel-history").header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.id").value(id))
                 .andExpect(jsonPath("$.role").value("CUSTOMER"));
         var claims = SignedJWT.parse(token).getJWTClaimsSet();
@@ -233,7 +233,7 @@ class AuthIntegrationTests {
     @Test void invalidIdentityOrRoleCannotAuthenticate() throws Exception {
         for (String token : new String[]{signedToken(secret, Instant.now().plusSeconds(60), "ADMIN", "1"),
                 signedToken(secret, Instant.now().plusSeconds(60), "CUSTOMER", "0")}) {
-            http.perform(get("/api/v1/reservations/1").header("Authorization", "Bearer " + token))
+            http.perform(get("/api/v1/customers/me/travel-history").header("Authorization", "Bearer " + token))
                     .andExpect(status().isUnauthorized()).andExpect(jsonPath("$.code").value("INVALID_ACCESS_TOKEN"));
         }
     }
@@ -250,9 +250,9 @@ class AuthIntegrationTests {
                 .andExpect(status().isOk()).andExpect(jsonPath("$.role").value("EMPLOYEE"));
     }
 
-    @Test void employeeCannotUseCustomerReservationPath() throws Exception {
+    @Test void employeeCannotUseCustomerHistoryPath() throws Exception {
         createEmployee();
-        http.perform(get("/api/v1/reservations/1").header("Authorization", "Bearer " + token("employee")))
+        http.perform(get("/api/v1/customers/me/travel-history").header("Authorization", "Bearer " + token("employee")))
                 .andExpect(status().isForbidden()).andExpect(jsonPath("$.code").value("FORBIDDEN"));
     }
 
@@ -311,7 +311,7 @@ class AuthIntegrationTests {
 
     @Test void bearerAuthenticationDoesNotCreateSession() throws Exception {
         signup("customer", "password");
-        var result = http.perform(get("/api/v1/reservations/1").header("Authorization", "Bearer " + token("customer")))
+        var result = http.perform(get("/api/v1/customers/me/travel-history").header("Authorization", "Bearer " + token("customer")))
                 .andExpect(status().isOk()).andReturn();
         assertThat(result.getRequest().getSession(false)).isNull();
         assertThat(result.getResponse().getCookie("JSESSIONID")).isNull();
@@ -353,7 +353,7 @@ class AuthIntegrationTests {
     @RestController
     @TestComponent
     static class SecurityProbe {
-        @GetMapping({"/api/v1/employee/security-probe", "/api/v1/reservations/{id}"})
+        @GetMapping({"/api/v1/employee/security-probe", "/api/v1/customers/me/travel-history"})
         AuthenticatedUser identity(@AuthenticationPrincipal Jwt principal) { return AuthenticatedUser.from(principal); }
 
         @GetMapping("/api/v1/employee/security-failure")

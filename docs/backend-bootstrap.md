@@ -37,8 +37,10 @@ approved shared v0.2 contracts. Implementation status:
 - B4 implemented: Reservation party/configuration/price rules, Loyalty eligibility,
   snapshot persistence and BR-31 Theme lock. See
   [reservation-domain-persistence.md](reservation-domain-persistence.md).
-- B5/B6/B8: Reservation REST, concurrency, recruitment aggregation/confirmation,
-  History REST and SMS integration.
+- B5 implemented: CUSTOMER Reservation REST, ownership, Schedule locking,
+  recruitment aggregation/confirmation and internal first-transition boundary.
+  See [reservation-api-concurrency.md](reservation-api-concurrency.md).
+- B6/B8: History REST and after-commit SMS integration.
 - Later use cases: atomic Inventory addition and provider integration.
 
 The existing pure Domain Foundation remains an incomplete in-memory model;
@@ -48,7 +50,7 @@ Local startup now also requires JWT_SECRET (at least 32 UTF-8 bytes).
 JWT_EXPIRES_IN_SECONDS defaults to 3600; Employee bootstrap is opt-in.
 Business date defaults to Asia/Seoul (BUSINESS_TIME_ZONE override).
 Backend-local choices still to make include SMS provider/retry mechanics,
-transaction/locking strategy, and deployment. These are implementation decisions,
+Inventory transaction/locking strategy, and deployment. These are implementation decisions,
 not unresolved shared contracts.
 
 ## Documentation boundary

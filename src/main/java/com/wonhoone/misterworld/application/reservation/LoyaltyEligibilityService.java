@@ -16,7 +16,7 @@ public class LoyaltyEligibilityService {
         this.businessDate = businessDate;
     }
 
-    /** B5 must call this before saving the new reservation in its create transaction. */
+    /** Called before saving the new reservation in the create transaction. */
     public boolean isEligible(long customerId) {
         if (customerId <= 0) throw new IllegalArgumentException("customerId must be positive");
         return reservations.countCompletedTrips(customerId, businessDate.today()) > 0;
