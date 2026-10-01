@@ -39,3 +39,10 @@ Build and test with the Maven Wrapper:
 .\mvnw.cmd test
 .\mvnw.cmd package
 ```
+
+## B9-A1 runtime validation
+
+The separate actual-MySQL harness, scenario tests and current validation record
+are documented in [B9-A1 MySQL runtime hardening](docs/b9-mysql-runtime-hardening.md).
+This verifies the current approved v0.2 snapshot; it is not a final freeze.
+Real SOLAPI/handset smoke remains B9-A2 and cross-repository E2E remains B9-B/C/D.
