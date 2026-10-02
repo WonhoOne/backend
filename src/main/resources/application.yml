@@ -14,6 +14,12 @@ spring:
   flyway:
     enabled: true
 
+demo:
+  provisioning:
+    enabled: ${DEMO_PROVISIONING_ENABLED:false}
+    scenario-file: ${DEMO_SCENARIO_FILE:}
+    expected-database: ${DEMO_EXPECTED_DATABASE:}
+
 business:
   time-zone: ${BUSINESS_TIME_ZONE:Asia/Seoul}
 

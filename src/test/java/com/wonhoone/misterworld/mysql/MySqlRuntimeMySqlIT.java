@@ -30,6 +30,8 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class MySqlRuntimeMySqlIT extends MySqlIntegrationSupport {
+    @Autowired com.wonhoone.misterworld.application.demo.DemoScenarioProvisioner demo;
+    @Autowired com.wonhoone.misterworld.application.tour.TourScheduleQueryService scheduleQueries;
     @Autowired Flyway flyway;
     @Autowired ApplicationContext context;
     @Autowired PasswordEncoder passwords;
@@ -57,6 +59,40 @@ class MySqlRuntimeMySqlIT extends MySqlIntegrationSupport {
         assertThat(facts.get("version").toString()).startsWith("8.");
         assertThat(facts.get("default_isolation")).isEqualTo("REPEATABLE-READ");
         assertThat(facts.get("sql_mode").toString()).contains("STRICT_TRANS_TABLES");
+    }
+
+    private com.wonhoone.misterworld.application.demo.DemoScenarioManifest demoManifest() {
+        var stylePrices = java.util.Arrays.stream(TourStyle.values()).map(style ->
+                new TourProductWriteRequest.StylePrice(style, 101L, "KRW")).toList();
+        return new com.wonhoone.misterworld.application.demo.DemoScenarioManifest(1,
+                List.of(new com.wonhoone.misterworld.application.demo.DemoScenarioManifest.Product("test-only",
+                        Theme.GOLF_CHALLENGE, "B9 Test Product", "Clearly test-only description", stylePrices)),
+                List.of(new com.wonhoone.misterworld.application.demo.DemoScenarioManifest.Schedule("test-only",
+                        LocalDate.of(2026, 11, 1), LocalDate.of(2026, 11, 5))));
+    }
+
+    @Test void externalDemoProvisioningIsReservableUnconfirmedAndOneShotOnMySql() {
+        demo.provision(demoManifest(), "misterworld");
+        assertThat(products.count()).isEqualTo(1); assertThat(prices.count()).isEqualTo(3);
+        assertThat(scheduleQueries.list(null)).singleElement().satisfies(schedule -> {
+            assertThat(schedule.reservable()).isTrue(); assertThat(schedule.recruitment().confirmed()).isFalse();
+        });
+        assertThat(accounts.count()).isZero(); assertThat(events.count()).isZero(); assertThat(recipients.count()).isZero();
+        assertThatThrownBy(() -> demo.provision(demoManifest(), "misterworld")).isInstanceOf(IllegalStateException.class);
+        assertThat(products.count()).isEqualTo(1);
+    }
+
+    @Test void laterSchedulePersistenceFailureRollsBackDemoCatalogOnMySql() {
+        var proxy = (org.springframework.aop.framework.Advised) schedules;
+        org.aopalliance.intercept.MethodInterceptor failure = call -> {
+            if (call.getMethod().getName().equals("save")) throw new IllegalStateException("B9 test-only later schedule failure");
+            return call.proceed();
+        };
+        proxy.addAdvice(0, failure);
+        try {
+            assertThatThrownBy(() -> demo.provision(demoManifest(), "misterworld")).isInstanceOf(RuntimeException.class);
+            assertThat(products.count()).isZero(); assertThat(prices.count()).isZero(); assertThat(schedules.count()).isZero();
+        } finally { proxy.removeAdvice(failure); }
     }
 
     @Test void schemaUsesInnoDbCompatibleTypesAndRequiredKeys() throws Exception {
