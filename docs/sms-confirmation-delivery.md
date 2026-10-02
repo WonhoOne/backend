@@ -223,3 +223,8 @@ The separate actual-MySQL harness, scenario tests and current validation record
 are documented in [B9-A1 MySQL runtime hardening](b9-mysql-runtime-hardening.md).
 This verifies the current approved v0.2 snapshot; it is not a final freeze.
 Real SOLAPI/handset smoke remains B9-A2 and cross-repository E2E remains B9-B/C/D.
+
+The [B9-A2.1 standalone demo and live smoke runbook](b9-demo-sms-readiness.md)
+provides the manual, operator-gated harness for B9-A2.2. Never enable real delivery
+on a rehearsal DB with pending recipients; use a separate fresh disposable DB.
+Actual SOLAPI send and handset receipt remain unverified until that human gate.

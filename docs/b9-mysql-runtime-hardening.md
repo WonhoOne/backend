@@ -215,7 +215,9 @@ query-plan sanity, not a production workload study. MySQL's collation equivalenc
 beyond canonical login trim/lowercase are observed rather than assigned new login
 semantics. Local test transport/credentials are unsuitable for deployment.
 
-B9-A2 owns final demo provisioning, real SOLAPI credentials/handset smoke and the
-standalone demo runbook. B9-B owns Frontend live adapters/integration and observed
+B9-A2.1 provides [external demo provisioning and the standalone/live smoke runbook](b9-demo-sms-readiness.md).
+Demo content remains team supplied; this is not a final freeze. B9-A2.2 owns the
+human/operator real SOLAPI + handset gate, which has not been executed here.
+B9-B owns Frontend live adapters/integration and observed
 CORS blockers. B9-C owns AI Console/Voice integration. B9-D owns final cross-repo
 E2E/release hardening. Frontend, ai-console and Shared docs are read-only here.
