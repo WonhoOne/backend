@@ -98,3 +98,10 @@ validation remains a later integration/hardening gate; no MySQL E2E claim is mad
 Boot-managed H2 2.4.240 triggers Flyway 12.4.0's newer-than-verified H2 warning
 (verified through 2.3.232). Migration/validation tests pass; keep dependency
 management intact and recheck this warning in integration/hardening.
+
+## B9-A1 runtime validation
+
+The separate actual-MySQL harness, scenario tests and current validation record
+are documented in [B9-A1 MySQL runtime hardening](b9-mysql-runtime-hardening.md).
+This verifies the current approved v0.2 snapshot; it is not a final freeze.
+Real SOLAPI/handset smoke remains B9-A2 and cross-repository E2E remains B9-B/C/D.

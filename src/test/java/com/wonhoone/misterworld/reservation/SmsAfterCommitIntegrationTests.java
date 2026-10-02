@@ -8,6 +8,10 @@ import java.util.concurrent.*;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.convention.TestBean;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import org.springframework.transaction.support.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,6 +25,11 @@ import static org.awaitility.Awaitility.await;
         "sms.solapi.sender-number=010-0000-0000"})
 @Timeout(30)
 class SmsAfterCommitIntegrationTests extends ReservationIntegrationSupport {
+    // Align capture/dispatch time to TIMESTAMP(6), independent of wall-clock precision and scheduler timing.
+    @TestBean(name = "smsClock", methodName = "fixedSmsClock") Clock smsClock;
+    static Clock fixedSmsClock() {
+        return Clock.fixed(Instant.parse("2026-10-01T00:00:00Z"), ZoneOffset.UTC);
+    }
     @MockitoBean SmsSender sender;
     @MockitoBean SmsDeliveryPoller poller;
 

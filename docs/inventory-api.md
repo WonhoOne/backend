@@ -112,3 +112,10 @@ audit endpoint or transaction ledger. Reservation/confirmation never deducts
 Inventory, and zero stock never hides a Product or blocks a Reservation.
 Frontend, ai-console and shared docs remain unchanged. No shared blocker was found.
 Next gates: B8 SMS durable after-commit delivery and B9 integration/hardening.
+
+## B9-A1 runtime validation
+
+The separate actual-MySQL harness, scenario tests and current validation record
+are documented in [B9-A1 MySQL runtime hardening](b9-mysql-runtime-hardening.md).
+This verifies the current approved v0.2 snapshot; it is not a final freeze.
+Real SOLAPI/handset smoke remains B9-A2 and cross-repository E2E remains B9-B/C/D.
