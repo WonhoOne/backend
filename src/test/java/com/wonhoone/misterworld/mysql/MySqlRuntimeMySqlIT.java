@@ -309,6 +309,81 @@ class MySqlRuntimeMySqlIT extends MySqlIntegrationSupport {
                 .andExpect(status().isOk()).andExpect(jsonPath("$.quantity").value(5));
     }
 
+    @Test void transportCapacityRejectsWithoutMySqlReservationOrOutboxSideEffects() throws Exception {
+        // D-01: real MySQL + production SecurityFilterChain/Reservation HTTP stack; no paid SMS.
+        var http = MockMvcBuilders.webAppContextSetup(web)
+                .addFilters(context.getBean("springSecurityFilterChain", Filter.class)).build();
+        var signup = new SignupRequest("b9-test-capacity", "b9-test-only-password",
+                "MySQL IT Customer", "Test address", "010-0000-0000");
+        http.perform(post("/api/v1/auth/signup").contentType("application/json")
+                .content(json.writeValueAsString(signup))).andExpect(status().isCreated());
+        var login = http.perform(post("/api/v1/auth/login").contentType("application/json")
+                .content(json.writeValueAsString(new LoginRequest(signup.loginId(), signup.password()))))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        String bearer = "Bearer " + json.readTree(login).get("accessToken").asString();
+        var target = futureSchedule();
+
+        var overCapacity = new ReservationCreateRequest(target.getId(), 4,
+                new ReservationCreateRequest.Configuration(TourStyle.GRAND, HotelOption.HOTEL_4_STAR,
+                        TransportOption.PRIVATE_LUXURY_CAR_2, MealOption.LOCAL_RESTAURANT, List.of()));
+        var validTwoSeats = new ReservationCreateRequest(target.getId(), 2, overCapacity.configuration());
+        var validVan = request(target.getId(), 4);
+
+        // Even before any Reservation exists, invalid input cannot create rows or events.
+        String invalidBody = json.writeValueAsString(overCapacity);
+        http.perform(post("/api/v1/reservations").header("Authorization", bearer).contentType("application/json")
+                .content(invalidBody))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"))
+                .andExpect(jsonPath("$.fieldErrors[?(@.field == 'configuration.transportOption')].code")
+                        .value(org.hamcrest.Matchers.hasItem("CAPACITY_EXCEEDED")));
+        assertThat(reservations.count()).isZero();
+        assertThat(reservations.totalParticipantsForSchedule(target.getId())).isZero();
+        assertThat(schedules.findById(target.getId()).orElseThrow().isConfirmed()).isFalse();
+        assertThat(events.count()).isZero();
+        assertThat(recipients.count()).isZero();
+
+        // Boundary-valid two-seat selection must persist normally but not yet confirm (threshold = 3).
+        http.perform(post("/api/v1/reservations").header("Authorization", bearer).contentType("application/json")
+                .content(json.writeValueAsString(validTwoSeats)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.schedule.recruitment.confirmed").value(false));
+        assertThat(reservations.count()).isEqualTo(1);
+        assertThat(reservations.totalParticipantsForSchedule(target.getId())).isEqualTo(2);
+        assertThat(events.count()).isZero();
+
+        // Invalid input must not alter an existing but unconfirmed recruitment aggregate.
+        http.perform(post("/api/v1/reservations").header("Authorization", bearer).contentType("application/json")
+                .content(invalidBody))
+                .andExpect(status().isUnprocessableContent());
+        assertThat(reservations.count()).isEqualTo(1);
+        assertThat(reservations.totalParticipantsForSchedule(target.getId())).isEqualTo(2);
+        assertThat(schedules.findById(target.getId()).orElseThrow().isConfirmed()).isFalse();
+        assertThat(events.count()).isZero();
+        assertThat(recipients.count()).isZero();
+
+        // Four participants fit the ten-seat van: first confirmation creates one outbox event.
+        http.perform(post("/api/v1/reservations").header("Authorization", bearer).contentType("application/json")
+                .content(json.writeValueAsString(validVan)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.schedule.recruitment.confirmed").value(true));
+        assertThat(reservations.count()).isEqualTo(2);
+        assertThat(reservations.totalParticipantsForSchedule(target.getId())).isEqualTo(6);
+        assertThat(schedules.findById(target.getId()).orElseThrow().isConfirmed()).isTrue();
+        assertThat(events.count()).isEqualTo(1);
+        assertThat(recipients.count()).isEqualTo(1); // Same customer in two Reservations.
+
+        // Rejected requests after confirmation must not create extra reservations or outbox events.
+        http.perform(post("/api/v1/reservations").header("Authorization", bearer).contentType("application/json")
+                .content(invalidBody))
+                .andExpect(status().isUnprocessableContent());
+        assertThat(reservations.count()).isEqualTo(2);
+        assertThat(reservations.totalParticipantsForSchedule(target.getId())).isEqualTo(6);
+        assertThat(schedules.findById(target.getId()).orElseThrow().isConfirmed()).isTrue();
+        assertThat(events.count()).isEqualTo(1);
+        assertThat(recipients.count()).isEqualTo(1);
+    }
+
     private void assertColumn(String table, String column, String type, String nullable) {
         var row = jdbc.queryForMap("SELECT data_type,is_nullable FROM information_schema.columns WHERE table_schema=DATABASE() AND table_name=? AND column_name=?", table, column);
         assertThat(row.get("data_type")).isEqualTo(type);
