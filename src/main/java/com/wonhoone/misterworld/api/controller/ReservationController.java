@@ -27,6 +27,13 @@ public class ReservationController {
         return commands.create(AuthenticatedUser.from(principal).id(), request).response();
     }
 
+    @PutMapping("/{reservationId}/configuration")
+    public ReservationResponse updateConfiguration(@AuthenticationPrincipal Jwt principal,
+                                                   @PathVariable long reservationId,
+                                                   @Valid @RequestBody ReservationConfigurationUpdateRequest request) {
+        return commands.updateConfiguration(AuthenticatedUser.from(principal).id(), reservationId, request);
+    }
+
     @GetMapping("/{reservationId}")
     public ReservationResponse detail(@AuthenticationPrincipal Jwt principal, @PathVariable long reservationId) {
         return queries.detail(AuthenticatedUser.from(principal).id(), reservationId);

@@ -52,12 +52,13 @@ public interface ReservationJpaRepository extends JpaRepository<ReservationJpaEn
     @Query("""
             select count(reservation) from ReservationJpaEntity reservation
             where reservation.customer.id = :customerId
-              and reservation.tourSchedule.confirmed = true
-              and reservation.scheduleEndDateSnapshot < :businessDate
+              and ((reservation.tourSchedule.confirmed = true
+                    and reservation.scheduleEndDateSnapshot < :businessDate)
+                   or reservation.tourSchedule.operationStatus = com.wonhoone.misterworld.domain.ScheduleOperationStatus.COMPLETED)
             """)
     long countCompletedTrips(@Param("customerId") long customerId, @Param("businessDate") LocalDate businessDate);
 
-    /** Same completed predicate as Loyalty: current confirmation, historical period. No option collections are loaded. */
+    /** Same completed predicate as Loyalty: confirmed and past, or marked COMPLETED by an employee. No option collections are loaded. */
     @Query("""
             select reservation.id as reservationId,
                    reservation.tourProductIdSnapshot as tourProductId,
@@ -70,8 +71,9 @@ public interface ReservationJpaRepository extends JpaRepository<ReservationJpaEn
                    reservation.price.currency as currency
             from ReservationJpaEntity reservation
             where reservation.customer.id = :customerId
-              and reservation.tourSchedule.confirmed = true
-              and reservation.scheduleEndDateSnapshot < :businessDate
+              and ((reservation.tourSchedule.confirmed = true
+                    and reservation.scheduleEndDateSnapshot < :businessDate)
+                   or reservation.tourSchedule.operationStatus = com.wonhoone.misterworld.domain.ScheduleOperationStatus.COMPLETED)
             order by reservation.scheduleEndDateSnapshot desc, reservation.id desc
             """)
     List<TravelHistoryRow> findTravelHistory(@Param("customerId") long customerId,

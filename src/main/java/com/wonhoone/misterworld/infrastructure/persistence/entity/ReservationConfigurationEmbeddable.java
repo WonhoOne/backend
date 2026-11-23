@@ -11,22 +11,22 @@ import org.hibernate.type.SqlTypes;
 public class ReservationConfigurationEmbeddable {
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.VARCHAR)
-    @Column(name = "style", nullable = false, length = 32, updatable = false)
+    @Column(name = "style", nullable = false, length = 32)
     private TourStyle style;
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.VARCHAR)
-    @Column(name = "hotel_option", nullable = false, length = 32, updatable = false)
+    @Column(name = "hotel_option", nullable = false, length = 32)
     private HotelOption hotelOption;
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.VARCHAR)
-    @Column(name = "transport_option", nullable = false, length = 32, updatable = false)
+    @Column(name = "transport_option", nullable = false, length = 32)
     private TransportOption transportOption;
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.VARCHAR)
-    @Column(name = "meal_option", nullable = false, length = 32, updatable = false)
+    @Column(name = "meal_option", nullable = false, length = 32)
     private MealOption mealOption;
 
     @ElementCollection(fetch = FetchType.LAZY)
@@ -47,6 +47,16 @@ public class ReservationConfigurationEmbeddable {
         snapshot.mealOption = configuration.mealOption();
         snapshot.extraOptions = new HashSet<>(configuration.extraOptions());
         return snapshot;
+    }
+
+    /** Mutates in place so the managed extra-option collection is replaced, not orphaned. */
+    void replaceWith(TourConfiguration configuration) {
+        style = configuration.style();
+        hotelOption = configuration.hotelOption();
+        transportOption = configuration.transportOption();
+        mealOption = configuration.mealOption();
+        extraOptions.clear();
+        extraOptions.addAll(configuration.extraOptions());
     }
 
     public TourConfiguration toDomain() {

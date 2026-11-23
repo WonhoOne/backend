@@ -41,11 +41,11 @@ class MySqlRuntimeMySqlIT extends MySqlIntegrationSupport {
     @Autowired WebApplicationContext web;
     @Autowired ObjectMapper json;
 
-    @Test void freshMySqlAppliesV1ThroughV4AndHibernateValidates() throws Exception {
+    @Test void freshMySqlAppliesV1ThroughV5AndHibernateValidates() throws Exception {
         assertThat(jdbc.queryForList("SELECT version FROM flyway_schema_history WHERE success=1 ORDER BY installed_rank", String.class))
-                .containsExactly("1", "2", "3", "4");
+                .containsExactly("1", "2", "3", "4", "5");
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM flyway_schema_history WHERE success=0", Long.class)).isZero();
-        assertThat(flyway.info().current().getVersion().getVersion()).isEqualTo("4");
+        assertThat(flyway.info().current().getVersion().getVersion()).isEqualTo("5");
         assertThat(flyway.validateWithResult().validationSuccessful).isTrue();
         assertThat(context.getEnvironment().getProperty("spring.jpa.hibernate.ddl-auto")).isEqualTo("validate");
         assertThat(context.getBeansOfType(SmsSender.class)).isEmpty();

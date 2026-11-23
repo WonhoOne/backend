@@ -30,6 +30,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/tours", "/api/v1/tours/{tourId}",
                                 "/api/v1/tour-schedules", "/api/v1/tour-schedules/{scheduleId}").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/reservations").hasRole("CUSTOMER")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/reservations/{reservationId}/configuration")
+                        .hasRole("CUSTOMER")
                         .requestMatchers(HttpMethod.GET, "/api/v1/reservations/{reservationId}",
                                 "/api/v1/customers/me/travel-history").hasRole("CUSTOMER")
                         .requestMatchers("/api/v1/employee/**").hasRole("EMPLOYEE")
