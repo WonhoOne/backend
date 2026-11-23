@@ -28,6 +28,9 @@ Customer Travel History snapshot projection and its presentation walkthrough are
 [docs/travel-history.md](docs/travel-history.md).
 Employee Inventory reads and atomic additions, row locking and the presentation
 walkthrough are in [docs/inventory-api.md](docs/inventory-api.md).
+Final-demo operations (customer reservation modification, employee departure with Theme souvenir
+deduction, completion; Flyway V5 `operation_status`) are in
+[docs/api-demo-scenario-operations.md](docs/api-demo-scenario-operations.md).
 B8 durable SMS confirmation, SOLAPI setup and its presentation walkthrough are in
 [docs/sms-confirmation-delivery.md](docs/sms-confirmation-delivery.md).
 Real delivery defaults off (`SMS_DELIVERY_ENABLED=false`); outbox capture remains on.
