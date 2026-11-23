@@ -9,6 +9,7 @@ public final class TourSchedule {
     private final List<Reservation> reservations = new ArrayList<>();
     private long totalParticipantCount;
     private boolean confirmed;
+    private ScheduleOperationStatus operationStatus = ScheduleOperationStatus.SCHEDULED;
 
     public TourSchedule(TourProduct tourProduct) {
         this.tourProduct = Objects.requireNonNull(tourProduct, "tourProduct must not be null");
@@ -17,6 +18,9 @@ public final class TourSchedule {
     /** Adds a reservation and returns true only when this call first confirms the schedule. */
     public boolean addReservation(Reservation reservation) {
         Objects.requireNonNull(reservation, "reservation must not be null");
+        if (operationStatus != ScheduleOperationStatus.SCHEDULED) {
+            throw new IllegalStateException("A departed or completed schedule does not accept reservations");
+        }
 
         validateReservationForSchedule(reservation);
 
@@ -49,6 +53,27 @@ public final class TourSchedule {
 
     public boolean isConfirmed() {
         return confirmed;
+    }
+
+    public ScheduleOperationStatus operationStatus() {
+        return operationStatus;
+    }
+
+    /** Confirmed -> Departed. Souvenir stock is deducted by the application service in the same transaction. */
+    public void depart() {
+        if (!confirmed) throw new IllegalStateException("Only a confirmed schedule can depart");
+        if (operationStatus != ScheduleOperationStatus.SCHEDULED) {
+            throw new IllegalStateException("Schedule has already departed");
+        }
+        operationStatus = ScheduleOperationStatus.DEPARTED;
+    }
+
+    /** Departed -> Completed. */
+    public void complete() {
+        if (operationStatus != ScheduleOperationStatus.DEPARTED) {
+            throw new IllegalStateException("Only a departed schedule can be completed");
+        }
+        operationStatus = ScheduleOperationStatus.COMPLETED;
     }
 
     private void validateReservationForSchedule(Reservation reservation) {
