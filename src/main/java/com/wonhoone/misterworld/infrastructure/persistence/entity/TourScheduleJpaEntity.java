@@ -1,6 +1,9 @@
 package com.wonhoone.misterworld.infrastructure.persistence.entity;
 
+import com.wonhoone.misterworld.domain.ScheduleOperationStatus;
 import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -11,6 +14,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.util.Objects;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "tour_schedule")
@@ -31,6 +36,11 @@ public class TourScheduleJpaEntity {
 
     @Column(name = "confirmed", nullable = false)
     private boolean confirmed;
+
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(name = "operation_status", nullable = false, length = 16)
+    private ScheduleOperationStatus operationStatus = ScheduleOperationStatus.SCHEDULED;
 
     protected TourScheduleJpaEntity() {
     }
@@ -71,5 +81,25 @@ public class TourScheduleJpaEntity {
         if (confirmed) return false;
         confirmed = true;
         return true;
+    }
+
+    public ScheduleOperationStatus getOperationStatus() {
+        return operationStatus;
+    }
+
+    /** Only a recruitment-confirmed schedule that has not departed can depart. Caller holds the row lock. */
+    public void markDeparted() {
+        if (!confirmed) throw new IllegalStateException("Only a confirmed schedule can depart");
+        if (operationStatus != ScheduleOperationStatus.SCHEDULED) {
+            throw new IllegalStateException("Schedule has already departed");
+        }
+        operationStatus = ScheduleOperationStatus.DEPARTED;
+    }
+
+    public void markCompleted() {
+        if (operationStatus != ScheduleOperationStatus.DEPARTED) {
+            throw new IllegalStateException("Only a departed schedule can be completed");
+        }
+        operationStatus = ScheduleOperationStatus.COMPLETED;
     }
 }

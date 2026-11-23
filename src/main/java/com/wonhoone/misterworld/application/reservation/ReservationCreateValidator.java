@@ -10,10 +10,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class ReservationCreateValidator {
     public TourConfiguration validate(Theme theme, ReservationCreateRequest request) {
+        return validate(theme, request.participantCount(), request.configuration());
+    }
+
+    /** Shared by create and by customer modification, where participantCount is the stored value. */
+    public TourConfiguration validate(Theme theme, int participantCount, ReservationCreateRequest.Configuration selected) {
         // Required fields and the base range have already passed Bean Validation at the HTTP boundary.
-        var selected = request.configuration();
         var errors = new ArrayList<ApiError.FieldError>();
-        if (theme == Theme.HONEYMOON_ROMANCE && request.participantCount() % 2 != 0) {
+        if (theme == Theme.HONEYMOON_ROMANCE && participantCount % 2 != 0) {
             errors.add(new ApiError.FieldError("participantCount", FieldErrorCode.NOT_ALLOWED,
                     "Honeymoon requires 2, 4, 6, 8 or 10 participants."));
         }
@@ -21,7 +25,7 @@ public class ReservationCreateValidator {
             errors.add(new ApiError.FieldError("configuration.style", FieldErrorCode.NOT_ALLOWED,
                     "This style is not allowed for the selected theme."));
         }
-        if (selected.transportOption().capacity() < request.participantCount()) {
+        if (selected.transportOption().capacity() < participantCount) {
             errors.add(new ApiError.FieldError("configuration.transportOption", FieldErrorCode.CAPACITY_EXCEEDED,
                     "Transport capacity must cover all participants."));
         }
@@ -35,7 +39,7 @@ public class ReservationCreateValidator {
         var configuration = TourConfiguration.create(selected.style(), selected.hotelOption(),
                 selected.transportOption(), selected.mealOption(), selected.extraOptions());
         // Public field errors do not replace the pure domain's final invariant checks.
-        ReservationConfigurationPolicy.validate(theme, request.participantCount(), configuration);
+        ReservationConfigurationPolicy.validate(theme, participantCount, configuration);
         return configuration;
     }
 }

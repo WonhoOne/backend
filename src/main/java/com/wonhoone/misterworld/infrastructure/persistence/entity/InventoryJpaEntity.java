@@ -59,4 +59,14 @@ public class InventoryJpaEntity {
         }
         quantity = Math.addExact(quantity, amount);
     }
+
+    public void removeQuantity(long amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("remove amount must be positive");
+        }
+        if (amount > quantity) {
+            throw new IllegalStateException("Inventory quantity is insufficient");
+        }
+        quantity -= amount;
+    }
 }

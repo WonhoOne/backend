@@ -3,6 +3,7 @@ package com.wonhoone.misterworld.application.tour;
 import com.wonhoone.misterworld.api.dto.TourScheduleResponse;
 import com.wonhoone.misterworld.api.error.*;
 import com.wonhoone.misterworld.application.time.BusinessDateProvider;
+import com.wonhoone.misterworld.domain.ScheduleOperationStatus;
 import com.wonhoone.misterworld.domain.TourScheduleReservabilityPolicy;
 import com.wonhoone.misterworld.domain.TourScheduleRecruitmentPolicy;
 import com.wonhoone.misterworld.infrastructure.persistence.entity.TourScheduleJpaEntity;
@@ -54,7 +55,9 @@ public class TourScheduleQueryService {
         var product = schedule.getTourProduct();
         long currentCount = TourScheduleRecruitmentPolicy.currentCountFromParticipants(product.getTheme(), participantTotal);
         return new TourScheduleResponse(schedule.getId(), product.getId(), schedule.getStartDate(),
-                schedule.getEndDate(), TourScheduleReservabilityPolicy.isReservable(schedule.getStartDate(), today),
+                schedule.getEndDate(),
+                schedule.getOperationStatus() == ScheduleOperationStatus.SCHEDULED
+                        && TourScheduleReservabilityPolicy.isReservable(schedule.getStartDate(), today),
                 ScheduleRecruitmentProjection.create(product.getTheme(), currentCount, schedule.isConfirmed()));
     }
 }

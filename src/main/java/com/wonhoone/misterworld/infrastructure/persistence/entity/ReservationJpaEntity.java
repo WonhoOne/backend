@@ -71,6 +71,21 @@ public class ReservationJpaEntity {
         return reservation;
     }
 
+    /**
+     * Customer modification before departure: participants and schedule stay fixed, so recruitment
+     * and confirmation are unaffected; only the configuration and its recalculated price change.
+     */
+    public void reconfigure(TourConfiguration configuration, ReservationPriceSnapshot price) {
+        Objects.requireNonNull(configuration, "configuration must not be null");
+        Objects.requireNonNull(price, "price must not be null");
+        ReservationConfigurationPolicy.validate(tourProductThemeSnapshot, participantCount, configuration);
+        if (price.subtotal() != Math.multiplyExact(price.unitPrice(), participantCount)) {
+            throw new IllegalArgumentException("Price subtotal must match the reservation participant count");
+        }
+        this.configuration.replaceWith(configuration);
+        this.price = ReservationPriceSnapshotEmbeddable.capture(price);
+    }
+
     public Long getId() { return id; }
     public UserAccountJpaEntity getCustomer() { return customer; }
     public TourScheduleJpaEntity getTourSchedule() { return tourSchedule; }

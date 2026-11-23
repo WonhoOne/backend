@@ -7,21 +7,21 @@ import org.hibernate.type.SqlTypes;
 
 @Embeddable
 public class ReservationPriceSnapshotEmbeddable {
-    @Column(name = "unit_price", nullable = false, updatable = false)
+    @Column(name = "unit_price", nullable = false)
     private long unitPrice;
-    @Column(name = "subtotal", nullable = false, updatable = false)
+    @Column(name = "subtotal", nullable = false)
     private long subtotal;
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.VARCHAR)
-    @Column(name = "discount_type", length = 32, updatable = false)
+    @Column(name = "discount_type", length = 32)
     private DiscountType discountType;
-    @Column(name = "discount_rate_percent", updatable = false)
+    @Column(name = "discount_rate_percent")
     private Integer discountRatePercent;
-    @Column(name = "discount_amount", updatable = false)
+    @Column(name = "discount_amount")
     private Long discountAmount;
-    @Column(name = "total", nullable = false, updatable = false)
+    @Column(name = "total", nullable = false)
     private long total;
-    @Column(name = "currency", nullable = false, length = 3, updatable = false)
+    @Column(name = "currency", nullable = false, length = 3)
     private String currency;
 
     protected ReservationPriceSnapshotEmbeddable() {}
